@@ -1,0 +1,20 @@
+# PvPMoney by charries96
+# Simple plugin to give money for killing other players
+# Originally developed for my home server, but realised the potential given other similar plugins are broken
+# 
+# Variables:
+#   %killer%    is automatically replaced with the name of the killer
+#   %victim%    is automatically replaced with the name of the victim
+#   %currency%  is automatically replaced with whatever your currency symbol is
+#   %reward%    is automatically replaced with how much money the killer gets
+
+pvpmoney:
+    prefix: '&4[&6PvPMoney&4]'
+    debug: false
+    rewards:
+        currency: '£'
+        amount: 10
+    messages:
+        killer: '&bYou killed &6%victim%&b and got &a%currency%%reward%!'
+        victim: '&4You were killed by &6%killer%!'
+        

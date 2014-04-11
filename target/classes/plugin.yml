@@ -1,0 +1,7 @@
+name: PvPMoney
+version: 0.1
+description: Reward players for PVP kills.
+author: charries96
+main: io.github.charries96.pvpmoney.Notifier
+depend: [Vault]
+prefix: PvPMoney
