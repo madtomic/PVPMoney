@@ -1,5 +1,7 @@
 package io.github.charries96.pvpmoney;
 
+import java.io.IOException;
+
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.permission.Permission;
@@ -16,6 +18,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.mcstats.Metrics;
 
 public final class Notifier extends JavaPlugin implements Listener {
 	
@@ -47,6 +50,14 @@ public final class Notifier extends JavaPlugin implements Listener {
 			getLogger().warning("A vault compatible Permissions system could not be found, extra funds will not be given even if a compatible Economy is installed.");
 		else
 			getLogger().info("Permissions found, using " + permissions.getName() + ".");
+		
+		try {
+		    Metrics metrics = new Metrics(this);
+		    metrics.start();
+			getLogger().info("Metrics enabled");
+		} catch (IOException e) {
+			getLogger().info("Metrics could not be enabled :(");
+		}
 		
 		loadConfig();
 		getLogger().info("Currency symbol: " + currency);
@@ -213,7 +224,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 	public void onJoin(PlayerJoinEvent e)
 	{
 		e.getPlayer().sendMessage(colourise(prefix) + ChatColor.GRAY + "PvPMoney Enabled");
-		if(permissions.has(e.getPlayer(), "pvpmoney.admin")) {
+		if(permissions.has(e.getPlayer(), "pvpmoney.admin") && debug) {
 			e.getPlayer().sendMessage("Using currency symbol: " + currency);
 			e.getPlayer().sendMessage("Money per kill: " + currency + value);
 			e.getPlayer().sendMessage("Money per kill (w/Extra): " + currency + extra);
