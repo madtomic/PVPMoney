@@ -30,7 +30,6 @@
 									<include>org/mcstats/**</include>
 								</includes>
 							</artifactSet>
-							<minimizeJar>true</minimizeJar>
 						</configuration>
 					</execution>
 				</executions>
