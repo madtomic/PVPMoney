@@ -210,7 +210,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 	public void onJoin(PlayerJoinEvent e)
 	{
 		e.getPlayer().sendMessage(colourise(prefix) + ChatColor.GRAY + "PvPMoney Enabled");
-		if(debug) {
+		if(permissions.has(e.getPlayer(), "pvpmoney.admin")) {
 			e.getPlayer().sendMessage("Using currency symbol: " + currency);
 			e.getPlayer().sendMessage("Money per kill: " + currency + value);
 			e.getPlayer().sendMessage("Money per kill (w/Extra): " + currency + extra);
