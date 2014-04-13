@@ -8,7 +8,9 @@ prefix: PvPMoney
 commands:
     pvpmoney:
         description: Modify PvPMoney variables
+        permission: pvpmoney.admin
         aliases: pvpm
+        permission-message: You do not have permission to do this.
 permissions:
     pvpmoney.extra:
         description: Give certain players extra money.

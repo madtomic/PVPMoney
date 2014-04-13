@@ -100,71 +100,66 @@ public final class Notifier extends JavaPlugin implements Listener {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if(permissions.has(sender, "pvpmoney.admin")) {
-			if (cmd.getName().equalsIgnoreCase("pvpmoney")) {
-				if(args.length < 1 || args == null)
-					doHelp(sender);
-				
-				if(args != null && args.length > 0) {
-					if(args[0] != null && args[0].length() >= 1) {
-						for(int i = 0; i < args.length; i++) {
-							sender.sendMessage("args[" + i + "] = " + args[i]);
-						}
-						/*if(args[0] == "extra") {
-							if(args[1] != null && args[1].length() >= 1) {
-								try {
-									double nmoney = Double.parseDouble(args[1]);
-									extra = "" + nmoney;
-									sender.sendMessage(ChatColor.GREEN + replaceValue(replaceCurrency("Players will now receive %currency%%reward% per kill."), true));
-									return true;
-								} catch (NumberFormatException e) {
-									sender.sendMessage(ChatColor.RED + "Error parsing value.");
-								}
-							} else {
-								sender.sendMessage(ChatColor.RED + "Invalid arguments given.");
-								sender.sendMessage(ChatColor.DARK_RED + "Usage: /pvpmoney extra <amount>");
+		if (cmd.getName().equalsIgnoreCase("pvpmoney")) {
+			if(args.length < 1 || args == null)
+				doHelp(sender);
+			
+			if(args != null && args.length > 0) {
+				if(args[0] != null && args[0].length() >= 1) {
+					if(args[0] == "extra") {
+						if(args[1] != null && args[1].length() >= 1) {
+							try {
+								double nmoney = Double.parseDouble(args[1]);
+								extra = "" + nmoney;
+								sender.sendMessage(ChatColor.GREEN + replaceValue(replaceCurrency("Players will now receive %currency%%reward% per kill."), true));
+								return true;
+							} catch (NumberFormatException e) {
+								sender.sendMessage(ChatColor.RED + "Error parsing value.");
 							}
-							return false;
+						} else {
+							sender.sendMessage(ChatColor.GREEN + "Value: " + extra);
+							sender.sendMessage(ChatColor.DARK_RED + "To set: /pvpmoney extra <amount>");
 						}
-						else if(args[0] == "money") {
-							if(args[1] != null && args[1].length() >= 1) {
-								try {
-									double nmoney = Double.parseDouble(args[1]);
-									value = "" + nmoney;
-									sender.sendMessage(ChatColor.GREEN + replaceValue(replaceCurrency("Players will now receive %currency%%reward% per kill."), false));
-									return true;
-								} catch (NumberFormatException e) {
-									sender.sendMessage(ChatColor.RED + "Error parsing value.");
-								}
-							} else {
-								sender.sendMessage(ChatColor.RED + "Invalid arguments given.");
-								sender.sendMessage(ChatColor.DARK_RED + "Usage: /pvpmoney money <amount>");
+						return false;
+					}
+					if(args[0] == "money") {
+						if(args[1] != null && args[1].length() >= 1) {
+							try {
+								double nmoney = Double.parseDouble(args[1]);
+								value = "" + nmoney;
+								sender.sendMessage(ChatColor.GREEN + replaceValue(replaceCurrency("Players will now receive %currency%%reward% per kill."), false));
+								return true;
+							} catch (NumberFormatException e) {
+								sender.sendMessage(ChatColor.RED + "Error parsing value.");
 							}
-							return false;
+						} else {
+							sender.sendMessage(ChatColor.GREEN + "Value: " + value);
+							sender.sendMessage(ChatColor.DARK_RED + "To set: /pvpmoney money <amount>");
 						}
-						else if(args[0] == "save") {
-							saveConfiguration();
-							sender.sendMessage(colourise(prefix) + ChatColor.GREEN + "Configuration saved.");
-							return true;
-						}
-						else if(args[0] == "reload") {
-							this.reloadConfig();
-							loadConfig();
-							return true;
-						}
-						else if(args[0] == "test") {
-							spoof(sender, "Dinnerbone", "God");
-							return true;
-						}
-						else {
-							doHelp(sender);
-							return false;
-						}*/
+						return false;
+					}
+					
+					if(args[0] == "save") {
+						saveConfiguration();
+						sender.sendMessage(colourise(prefix) + ChatColor.GREEN + "Configuration saved.");
+						return true;
+					}
+					if(args[0] == "reload") {
+						this.reloadConfig();
+						loadConfig();
+						sender.sendMessage(ChatColor.GREEN + "Reloaded config.yml");
+						return true;
+					}
+					if(args[0] == "test") {
+						spoof(sender, "Dinnerbone", "God");
+						return true;
 					}
 				}
+				else {
+					doHelp(sender);
+					return false;
+				}
 			}
-		} else {
-			sender.sendMessage(ChatColor.RED + "You do not have permission to use this.");
 		}
 		return false;
 	}
