@@ -134,6 +134,9 @@ public final class Notifier extends JavaPlugin implements Listener {
 						sender.sendMessage(ChatColor.GREEN + "Value: " + value);
 						sender.sendMessage(ChatColor.GREEN + "To set: /pvpmoney money <amount>");
 					}
+				} else if(args[0].equalsIgnoreCase("reload")) {
+					this.reloadConfig();
+					sender.sendMessage(ChatColor.GREEN + "Config.yml reloaded.");
 				} else if(args[0].equalsIgnoreCase("test")) {
 					spoof(sender, "Dinnerbone", "Dinnerbone");
 					return true;
