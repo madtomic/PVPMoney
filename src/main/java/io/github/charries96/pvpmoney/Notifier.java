@@ -103,7 +103,6 @@ public final class Notifier extends JavaPlugin implements Listener {
 		if (cmd.getName().equalsIgnoreCase("pvpmoney")) {
 			if(args.length < 1 || args == null)
 				doHelp(sender);
-			
 			if(args != null && args.length > 0) {
 				if(args[0] != null && args[0].length() >= 1) {
 					if(args[0] == "extra") {
@@ -118,7 +117,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 							}
 						} else {
 							sender.sendMessage(ChatColor.GREEN + "Value: " + extra);
-							sender.sendMessage(ChatColor.DARK_RED + "To set: /pvpmoney extra <amount>");
+							sender.sendMessage(ChatColor.GREEN + "To set: /pvpmoney extra <amount>");
 						}
 						return false;
 					}
@@ -134,7 +133,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 							}
 						} else {
 							sender.sendMessage(ChatColor.GREEN + "Value: " + value);
-							sender.sendMessage(ChatColor.DARK_RED + "To set: /pvpmoney money <amount>");
+							sender.sendMessage(ChatColor.GREEN + "To set: /pvpmoney money <amount>");
 						}
 						return false;
 					}

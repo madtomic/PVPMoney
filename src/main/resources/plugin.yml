@@ -13,11 +13,8 @@ commands:
         permission-message: You do not have permission to do this.
 permissions:
     pvpmoney.extra:
-        description: Give certain players extra money.
+        description: Give players extra money.
         default: false
     pvpmoney.admin:
         description: Allow players to edit PvPMoney variables using commands.
-        default: false
-    pvpmoney.admin.debug:
-        description: View debugging information
         default: false
