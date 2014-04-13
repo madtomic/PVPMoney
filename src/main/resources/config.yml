@@ -14,8 +14,8 @@ pvpmoney:
     debug: false
     rewards:
         currency: £
-        amount: 10
-        ranked: 15
+        amount: 50
+        ranked: 100
     messages:
         killer: '&4You killed &c%victim%&4 and got &a%currency%%reward%!'
         victim: '&4You were killed by &6%killer%!'
