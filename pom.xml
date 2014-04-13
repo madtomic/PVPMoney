@@ -54,7 +54,4 @@
     	<name>charries96 Software</name>
     	<url>http://charries96.github.io/</url>
     </organization>
-    <ciManagement>
-    	<url>localhost:8080</url>
-    </ciManagement>
 </project>
