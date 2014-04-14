@@ -17,4 +17,7 @@ permissions:
         default: false
     pvpmoney.admin:
         description: Allow players to edit PvPMoney variables using commands.
-        default: false
+        default: op
+    pvpmoney.punishments.exempt:
+        description: No money taken on death
+        default: op
