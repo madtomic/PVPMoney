@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.github.charries96</groupId>
 	<artifactId>PVPMoney</artifactId>
-	<version>0.4-SNAPSHOT</version>
+	<version>0.5</version>
 	<build>
 		<plugins>
 			<plugin>
@@ -40,9 +40,5 @@
 			<version>1.2.32</version>
 			<scope>provided</scope>
 		</dependency>
-	</dependencies>
-	<organization>
-		<name>charries96 Software</name>
-		<url>http://charries96.github.io/</url>
-	</organization>
+    </dependencies>
 </project>

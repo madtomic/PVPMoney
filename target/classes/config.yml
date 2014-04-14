@@ -6,17 +6,21 @@
 #   %killer%    is automatically replaced with the name of the killer
 #   %victim%    is automatically replaced with the name of the victim
 #   %currency%  is automatically replaced with whatever your currency symbol is
-#   %reward%    is automatically replaced with how much money the killer gets
+#   %amount%    is automatically replaced with how much money the killer gets
 #   Giving the users the "pvpmoney.extras" node will give them the amount under ranked instead.
 
 pvpmoney:
+    auto-update: true
     prefix: '&4[&6PvPMoney&4]'
-    debug: false
     rewards:
         currency: £
         amount: 50
         ranked: 100
+    punishments:
+        enabled: false
+        amount: 50
+        message: '&4You were killed by &6%killer% &4and lost &c%currency%amount%!'
     messages:
-        killer: '&4You killed &c%victim%&4 and got &a%currency%%reward%!'
+        killer: '&4You killed &c%victim%&4 and got &a%currency%%amount%!'
         victim: '&4You were killed by &6%killer%!'
         

@@ -2,6 +2,7 @@ package io.github.charries96.pvpmoney;
 
 import java.io.IOException;
 
+import net.gravitydevelopment.updater.Updater;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.permission.Permission;
@@ -25,12 +26,14 @@ public final class Notifier extends JavaPlugin implements Listener {
     public static Economy economy = null;
     public static Permission permissions = null;
     
-    private String killmsg = "&4You killed &c%victim%&4 and got &a%currency%%reward%!";
+    private String killmsg = "&4You killed &c%victim%&4 and got &a%currency%%amount%!";
     private String deathmsg = "&4You were killed by %killer%!";
-    private String value = "10";
-    private String extra = "15";
+    private String value = "50";
+    private String extra = "100";
     private String currency = "£";
-    private Boolean debug = false;
+    private String punishment = "50";
+    private Boolean usePunishments = false;
+    private String punishmsg = "&4You were killed by &6%killer% &4and lost &c%currency%%amount%!";
 	
 	@Override
 	public void onEnable() {
@@ -59,10 +62,9 @@ public final class Notifier extends JavaPlugin implements Listener {
 		}
 		
 		loadConfig();
-		getLogger().info("Currency symbol: " + currency);
-		getLogger().info("Reward (w/o Extra): " + value);
-		getLogger().info("Reward (w/ Extra): " + extra);
-		getLogger().info("Loaded config.yml values");
+	
+		Updater updater = new Updater(this, 77878, this.getFile(), Updater.UpdateType.DEFAULT, true);
+
 	}
 	
 	private void loadConfig() {
@@ -85,7 +87,17 @@ public final class Notifier extends JavaPlugin implements Listener {
 		if(this.getConfig().getString("pvpmoney.rewards.ranked") != "" && this.getConfig().getString("pvpmoney.rewards.ranked").length() >= 1)
 			extra = this.getConfig().getString("pvpmoney.rewards.ranked");
 		
-		debug = this.getConfig().getBoolean("pvpmoney.debug");
+		if(this.getConfig().getBoolean("pvpmoney.punishments.enabled")) {
+			usePunishments = true;
+			
+			if(this.getConfig().getString("pvpmoney.punishments.amount") != "" && this.getConfig().getString("pvpmoney.punishments.amount").length() >= 1)
+				punishment = this.getConfig().getString("pvpmoney.punishments.amount");
+			
+			if(this.getConfig().getString("pvpmoney.punishments.message") != "" && this.getConfig().getString("pvpmoney.punishments.message").length() >= 1)
+				punishmsg = this.getConfig().getString("pvpmoney.punishments.message");
+		}
+		
+		getLogger().info("Loaded config.yml values");
 	}
 
 	@Override
@@ -100,6 +112,8 @@ public final class Notifier extends JavaPlugin implements Listener {
 		sendHelp(sender, "help", "Display this page");
 		sendHelp(sender, "extra", "<amount>", "Set money per kill (w/ pvpmoney.extra)");
 		sendHelp(sender, "money", "<amount>", "Set money per kill (w/o pvpmoney.extra)");
+		sendHelp(sender, "punish", "<amount>", "Set money lost on death");
+		sendHelp(sender, "money", "<true/false>", "Enable or disable punishments");
 		sendHelp(sender, "test", "Display messages users would see");
 	}
 	
@@ -114,7 +128,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 						try {
 							double nmoney = Double.parseDouble(args[1]);
 							extra = "" + nmoney;
-							sender.sendMessage(ChatColor.GREEN + replaceValue(replaceCurrency("Players will now receive %currency%%reward% per kill."), true));
+							sender.sendMessage(ChatColor.GREEN + replaceValue(replaceCurrency("Players will now receive %currency%%amount% per kill."), AMOUNT.Extra));
 							this.getConfig().set("pvpmoney.rewards.ranked", Double.parseDouble(extra));
 							this.saveConfig();
 							return true;
@@ -123,8 +137,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 							return false;
 						}
 					} else {
-						sender.sendMessage(ChatColor.GREEN + "Value: " + extra);
-						sender.sendMessage(ChatColor.GREEN + "To set: /pvpmoney extra <amount>");
+						sender.sendMessage(ChatColor.GREEN + "Players currently receive " + currency + extra + " per kill.");
 					}
 					return false;
 				} else if(args[0].equalsIgnoreCase("money")) {
@@ -132,7 +145,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 						try {
 							double nmoney = Double.parseDouble(args[1]);
 							value = "" + nmoney;
-							sender.sendMessage(ChatColor.GREEN + replaceValue(replaceCurrency("Players will now receive %currency%%reward% per kill."), false));
+							sender.sendMessage(ChatColor.GREEN + replaceValue(replaceCurrency("Players will now receive %currency%%amount% per kill."), AMOUNT.Reward));
 							this.getConfig().set("pvpmoney.rewards.amount", Double.parseDouble(value));
 							this.saveConfig();
 							return true;
@@ -141,9 +154,34 @@ public final class Notifier extends JavaPlugin implements Listener {
 							return false;
 						}
 					} else {
-						sender.sendMessage(ChatColor.GREEN + "Value: " + value);
-						sender.sendMessage(ChatColor.GREEN + "To set: /pvpmoney money <amount>");
+						sender.sendMessage(ChatColor.GREEN + "Players currently receive " + currency + value + " per kill.");
 					}
+				} else if(args[0].equalsIgnoreCase("punish")) {
+					if(args[1] != null && args[1].length() >= 1) {
+						if(args[1].equalsIgnoreCase("true")) {
+							usePunishments = true;
+							sender.sendMessage(ChatColor.GREEN + "Punishments Enabled.");
+						}
+						else if(args[1].equalsIgnoreCase("false")) {
+							usePunishments = false;
+							sender.sendMessage(ChatColor.RED + "Punishments disabled.");
+						}
+						else {
+							try {
+								double nmoney = Double.parseDouble(args[1]);
+								punishment = "" + nmoney;
+								sender.sendMessage(ChatColor.GREEN + replaceValue(replaceCurrency("Players will now lose %currency%%amount% on death."), AMOUNT.Punishment));
+								this.getConfig().set("pvpmoney.punishments.amount", Double.parseDouble(punishment));
+								this.saveConfig();
+								return true;
+							} catch (NumberFormatException e) {
+								sender.sendMessage(ChatColor.RED + "Error parsing value.");
+								return false;
+							}
+						}
+					} else
+						sender.sendMessage(ChatColor.GREEN + "Players currently lose " + currency + punishment + " per death.");
+					
 				} else if(args[0].equalsIgnoreCase("reload")) {
 					this.reloadConfig();
 					sender.sendMessage(ChatColor.GREEN + "Config.yml reloaded.");
@@ -160,12 +198,14 @@ public final class Notifier extends JavaPlugin implements Listener {
 	}
 	
 	public void spoof(CommandSender sender, String killer, String victim) {
-		sender.sendMessage(colourise(replaceValue(replaceCurrency(replaceVictim(replaceKiller(killmsg, killer), victim)), false)));
-		sender.sendMessage(colourise(replaceValue(replaceCurrency(replaceVictim(replaceKiller(killmsg, killer), victim)), true)));
+		sender.sendMessage(colourise(replaceValue(replaceCurrency(replaceVictim(replaceKiller(killmsg, killer), victim)), AMOUNT.Reward)));
+		sender.sendMessage(colourise(replaceValue(replaceCurrency(replaceVictim(replaceKiller(killmsg, killer), victim)), AMOUNT.Extra)));
+		sender.sendMessage(colourise(replaceValue(replaceCurrency(replaceVictim(replaceKiller(punishmsg, killer), victim)), AMOUNT.Punishment)));
 		sender.sendMessage(colourise(replaceKiller(deathmsg, killer)));
 		sender.sendMessage(ChatColor.RED + replaceCurrency("Currency Symbol: %currency%"));
-		sender.sendMessage(ChatColor.RED + replaceValue("Regular Reward: %reward%", false));
-		sender.sendMessage(ChatColor.RED + replaceValue("\"Extra\" Reward: %reward%", true));
+		sender.sendMessage(ChatColor.RED + replaceValue("Regular Reward: %amount%", AMOUNT.Reward));
+		sender.sendMessage(ChatColor.RED + replaceValue("\"Extra\" Reward: %amount%", AMOUNT.Extra));
+		sender.sendMessage(ChatColor.RED + replaceValue("Punishment: %amount%", AMOUNT.Punishment));
 	}
 	
 	public void sendHelp(CommandSender sender, String subcommand, String description) {
@@ -187,22 +227,33 @@ public final class Notifier extends JavaPlugin implements Listener {
 			String killern = e.getEntity().getKiller().getName();
 			String victimn = e.getEntity().getName();
 			// END: Get Killer & Victim name
-			
-			// Tell our Victim about their death.
-			victim.sendMessage(colourise(prefix + " " + replaceKiller(deathmsg, killern)));
 						
 			EconomyResponse r = null;
+			EconomyResponse p = null;
 			if(permissions.has(killer, "pvpmoney.extra"))
 				r = economy.depositPlayer(killern, Double.parseDouble(extra));
 			else
 				r = economy.depositPlayer(killern, Double.parseDouble(value));
-			
+
+			// Tell our Victim about their death.
+			if(usePunishments) {
+				if(!permissions.has(victim, "pvpmoney.punishments.exempt")) {
+					p = economy.withdrawPlayer(victimn, Double.parseDouble(punishment));
+					if(p.transactionSuccess())
+						victim.sendMessage(colourise(prefix + " " + replaceValue(replaceKiller(punishmsg, killern), AMOUNT.Punishment)));
+					else
+						victim.sendMessage(colourise(prefix + " " + "&cError removing funds from your account."));
+				}
+			} else {
+				victim.sendMessage(colourise(prefix + " " + replaceKiller(deathmsg, killern)));
+			}
+
 			if(r.transactionSuccess()) {
 				// Make the Killers day
 				if(permissions.has(killer, ""))
-					killer.sendMessage(replaceCurrency(colourise(prefix) + " " + replaceValue(replaceVictim(killmsg, victimn), true)));
+					killer.sendMessage(replaceCurrency(colourise(prefix) + " " + replaceValue(replaceVictim(killmsg, victimn), AMOUNT.Extra)));
 				else
-					killer.sendMessage(replaceCurrency(colourise(prefix) + " " + replaceValue(replaceVictim(killmsg, victimn), false)));
+					killer.sendMessage(replaceCurrency(colourise(prefix) + " " + replaceValue(replaceVictim(killmsg, victimn), AMOUNT.Reward)));
             } else {
             	// Oh no, better compensate them!
             	killer.sendMessage(prefix + ChatColor.DARK_RED + " An error occured when rewarding you.");
@@ -223,14 +274,8 @@ public final class Notifier extends JavaPlugin implements Listener {
 	public void onJoin(PlayerJoinEvent e)
 	{
 		e.getPlayer().sendMessage(colourise(prefix) + ChatColor.GRAY + " PvPMoney Enabled");
-		if(permissions.has(e.getPlayer(), "pvpmoney.admin") && debug) {
-			e.getPlayer().sendMessage("Using currency symbol: " + currency);
-			e.getPlayer().sendMessage("Money per kill: " + currency + value);
-			e.getPlayer().sendMessage("Money per kill (w/Extra): " + currency + extra);
-			e.getPlayer().sendMessage("Extra money: " + (permissions.has(e.getPlayer(), "pvpmoney.extra")));
-		}
 	}
-	
+		
 	public String colourise(String str) {
 		return ChatColor.translateAlternateColorCodes('&', str);
 	}
@@ -253,10 +298,17 @@ public final class Notifier extends JavaPlugin implements Listener {
 		return str;
 	}
 	
-	public String replaceValue(String str, Boolean extra) {
-		if(str.contains("%reward%"))
-			return (extra ? str.replace("%reward%", this.extra) : str.replace("%reward%", value));
-		return str;
+	public String replaceValue(String str, AMOUNT amount) {
+		switch(amount) {
+			case Reward:
+				return str.replace("%amount%", this.value);
+			case Punishment:
+				return str.replace("%amount%", this.punishment);
+			case Extra:
+				return str.replace("%amount%", this.extra);
+			default:
+				return str;
+		}
 	}
 		
 	private boolean setupEconomy()
@@ -275,4 +327,8 @@ public final class Notifier extends JavaPlugin implements Listener {
         }
         return (permissions != null);
     }
+	
+	public enum AMOUNT {
+		Reward, Extra, Punishment
+	}
 }
