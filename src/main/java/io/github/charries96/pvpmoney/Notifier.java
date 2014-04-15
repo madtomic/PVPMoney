@@ -18,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -35,9 +36,11 @@ public final class Notifier extends JavaPlugin implements Listener {
 	private String extra = "100";
 	private String currency = "£";
 	private String punishment = "50";
+	private String newFileName = "";
+	private Boolean notify = false;
 	private Boolean usePunishments = false;
 	private Boolean useRewards = false;
-	private Boolean useUpdater = false;
+	private Boolean canUpdate = false;
 
 	@Override
 	public void onEnable() {
@@ -46,8 +49,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 		getLogger().info("Running " + this.getDescription().getName() + " v" + this.getDescription().getVersion() + " by charries96");
 
 		getServer().getPluginManager().registerEvents(this, this);
-		getLogger().info("Registered \"onKill\" event");
-		getLogger().info("Registered \"onJoin\" event");
+		getLogger().info("EventHandlers registered.");
 
 		// Lets try hooking into an economy & permissions system
 		if (!setupEconomy())
@@ -69,24 +71,19 @@ public final class Notifier extends JavaPlugin implements Listener {
 		try {
 			Metrics metrics = new Metrics(this);
 			metrics.start();
-			getLogger().info("Metrics enabled");
+			getLogger().info("Metrics enabled.");
 		} catch (IOException e) {
-			getLogger().info("Metrics could not be enabled :(");
+			getLogger().info("Metrics could not be enabled.");
 		}
 
 		loadConfig();
 
-		if(useUpdater) {
-			getLogger().info("auto-update enabled, will try using Gravity\'s Updater.");
-
-			Updater updater = new Updater(this, 77878, this.getFile(), UpdateType.DEFAULT, true);
+		if(canUpdate) {
+			Updater updater = new Updater(this, 77878, this.getFile(), UpdateType.NO_DOWNLOAD, false);
 			if (updater.getResult() == UpdateResult.UPDATE_AVAILABLE) {
-			    this.getLogger().info("Plugin update available!");
-			} else if (updater.getResult() == UpdateResult.FAIL_DOWNLOAD) {
-				this.getLogger().warning("Failed to download update, please download manually.");
-			} else if (updater.getResult() == UpdateResult.SUCCESS) {
-				this.getLogger().info("Plugin updated from PvPMoney v" + this.getDescription().getVersion() + " to " + updater.getLatestName());
-			}
+			    newFileName = updater.getLatestName();
+			    notify = true;
+			} 
 		}
 	}
 
@@ -101,8 +98,8 @@ public final class Notifier extends JavaPlugin implements Listener {
 		punishmsg = getString("pvpmoney.messages.punished");
 		value = getString("pvpmoney.rewards.amount");
 
-		if (this.getConfig().getBoolean("pvpmoney.auto-update"))
-			useUpdater = true;
+		if (this.getConfig().getBoolean("pvpmoney.can-update"))
+			canUpdate = true;
 		if (this.getConfig().getBoolean("pvpmoney.rewards.enabled"))
 			useRewards = true;
 		if (this.getConfig().getBoolean("pvpmoney.punishments.enabled"))
@@ -128,13 +125,10 @@ public final class Notifier extends JavaPlugin implements Listener {
 				+ ChatColor.DARK_AQUA + "]" + ChatColor.AQUA + " ------");
 
 		sendHelp(sender, "help", "Display this page");
-		sendHelp(sender, "extra", "<amount>",
-				"Set money per kill (w/ pvpmoney.extra)");
-		sendHelp(sender, "money", "<amount>",
-				"Set money per kill (w/o pvpmoney.extra)");
+		sendHelp(sender, "extra", "<amount>", "Set money per kill (w/ pvpmoney.extra)");
+		sendHelp(sender, "money", "<amount>", "Set money per kill (w/o pvpmoney.extra)");
 		sendHelp(sender, "punish", "<amount>", "Set money lost on death");
-		sendHelp(sender, "money", "<true/false>",
-				"Enable or disable punishments");
+		sendHelp(sender, "money", "<true/false>", "Enable or disable punishments");
 		sendHelp(sender, "update", "Force the plugin to check for updates");
 		sendHelp(sender, "test", "Display messages users would see");
 	}
@@ -241,16 +235,14 @@ public final class Notifier extends JavaPlugin implements Listener {
 					return true;
 				} else if (args[0].equalsIgnoreCase("update")) {
 					sender.sendMessage(ChatColor.GREEN + "Forcing plugin to look for updates..");
-					Updater updater = new Updater(this, 77878, this.getFile(), UpdateType.NO_VERSION_CHECK, false);
+					Updater updater = new Updater(this, 77878, this.getFile(), UpdateType.NO_VERSION_CHECK, true);
 					switch(updater.getResult()) {
 						case FAIL_DOWNLOAD:
 							sender.sendMessage(ChatColor.RED + "Update failed! :(");
 							break;
-						case UPDATE_AVAILABLE:
-							sender.sendMessage(ChatColor.GREEN + "Update available, attempting to download it.");
-							break;
 						case SUCCESS:
 							sender.sendMessage(ChatColor.GREEN + "Plugin updated successfully!");
+							sender.sendMessage(prefix() + ChatColor.GREEN + "Changes will take effect after a reload.");
 							break;
 					}
 				} else {
@@ -376,7 +368,10 @@ public final class Notifier extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		e.getPlayer().sendMessage(
-				prefix() + ChatColor.GRAY + " PvPMoney Enabled");
+				prefix() + ChatColor.GRAY + "PvPMoney Enabled");
+		if(permissions.has(e.getPlayer(), "pvpmoney.admin")) {
+			e.getPlayer().sendMessage(prefix() + ChatColor.GREEN + newFileName + " is now available, run \"/pvpmoney update\" to install it.");
+		}
 	}
 
 	public String colourise(String str) {

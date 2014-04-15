@@ -10,7 +10,7 @@
 #   Giving the users the "pvpmoney.extras" node will give them the amount under ranked instead.
 
 pvpmoney:
-    auto-update: true
+    can-update: true
     prefix: '&4[&6PvPMoney&4]'
     rewards:
         enabled: true
