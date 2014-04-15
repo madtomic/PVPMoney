@@ -24,4 +24,3 @@ pvpmoney:
         killer: '&4You killed &c%victim%&4 and got &a%currency%%amount%!'
         victim: '&4You were killed by &6%killer%!'
         punished: '&4You were killed by &6%killer% &4and lost &c%currency%%amount%!'
-        

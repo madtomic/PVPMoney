@@ -2,6 +2,8 @@ package io.github.charries96.pvpmoney;
 
 import java.io.IOException;
 
+import net.gravitydevelopment.updater.Updater;
+import net.gravitydevelopment.updater.Updater.*;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.permission.Permission;
@@ -16,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -35,10 +38,13 @@ public final class Notifier extends JavaPlugin implements Listener {
 	private String punishment = "50";
 	private Boolean usePunishments = false;
 	private Boolean useRewards = false;
+	private Boolean useUpdater = false;
 
 	@Override
 	public void onEnable() {
 		this.saveDefaultConfig();
+
+		getLogger().info("Running " + this.getDescription().getName() + " v" + this.getDescription().getVersion() + " by charries96");
 
 		getServer().getPluginManager().registerEvents(this, this);
 		getLogger().info("Registered \"onKill\" event");
@@ -71,6 +77,18 @@ public final class Notifier extends JavaPlugin implements Listener {
 
 		loadConfig();
 
+		if(useUpdater) {
+			getLogger().info("auto-update enabled, will try using Gravity\'s Updater.");
+
+			Updater updater = new Updater(this, 77878, this.getFile(), UpdateType.DEFAULT, true);
+			if (updater.getResult() == UpdateResult.UPDATE_AVAILABLE) {
+			    this.getLogger().info("Plugin update available!");
+			} else if (updater.getResult() == UpdateResult.FAIL_DOWNLOAD) {
+				this.getLogger().warning("Failed to download update, please download manually.");
+			} else if (updater.getResult() == UpdateResult.SUCCESS) {
+				this.getLogger().info("Plugin updated from PvPMoney v" + this.getDescription().getVersion() + " to " + updater.getLatestName());
+			}
+		}
 	}
 
 	private void loadConfig() {
@@ -84,6 +102,8 @@ public final class Notifier extends JavaPlugin implements Listener {
 		punishmsg = getString("pvpmoney.messages.punished");
 		value = getString("pvpmoney.rewards.amount");
 
+		if (this.getConfig().getBoolean("pvpmoney.auto-update"))
+			useUpdater = true;
 		if (this.getConfig().getBoolean("pvpmoney.rewards.enabled"))
 			useRewards = true;
 		if (this.getConfig().getBoolean("pvpmoney.punishments.enabled"))
@@ -105,7 +125,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 
 	private void doHelp(CommandSender sender) {
 		sender.sendMessage(ChatColor.AQUA + "------ " + ChatColor.DARK_AQUA
-				+ "[" + ChatColor.GOLD + "PvPMoney by charries96"
+				+ "[" + ChatColor.GOLD + "PvPMoney v" + this.getDescription().getVersion() + " by charries96"
 				+ ChatColor.DARK_AQUA + "]" + ChatColor.AQUA + " ------");
 
 		sendHelp(sender, "help", "Display this page");
@@ -116,6 +136,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 		sendHelp(sender, "punish", "<amount>", "Set money lost on death");
 		sendHelp(sender, "money", "<true/false>",
 				"Enable or disable punishments");
+		sendHelp(sender, "update", "Force the plugin to check for updates");
 		sendHelp(sender, "test", "Display messages users would see");
 	}
 
@@ -219,6 +240,20 @@ public final class Notifier extends JavaPlugin implements Listener {
 				} else if (args[0].equalsIgnoreCase("test")) {
 					spoof(sender, "Dinnerbone", "Dinnerbone");
 					return true;
+				} else if (args[0].equalsIgnoreCase("update")) {
+					sender.sendMessage(ChatColor.GREEN + "Forcing plugin to look for updates..");
+					Updater updater = new Updater(this, 77878, this.getFile(), UpdateType.DEFAULT, false);
+					switch(updater.getResult()) {
+						case FAIL_DOWNLOAD:
+							sender.sendMessage(ChatColor.RED + "Update failed! :(");
+							break;
+						case UPDATE_AVAILABLE:
+							sender.sendMessage(ChatColor.GREEN + "Update available, attempting to download it.");
+							break;
+						case SUCCESS:
+							sender.sendMessage(ChatColor.GREEN + "Plugin updated successfully!");
+							break;
+					}
 				} else {
 					doHelp(sender);
 					return false;

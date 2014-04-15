@@ -1,5 +1,5 @@
 name: PvPMoney
-version: 0.5
+version: 0.6
 description: Reward players for PVP kills.
 author: charries96
 main: io.github.charries96.pvpmoney.Notifier
@@ -14,7 +14,7 @@ commands:
 permissions:
     pvpmoney.extra:
         description: Give players extra money.
-        default: false
+        default: op
     pvpmoney.admin:
         description: Allow players to edit PvPMoney variables using commands.
         default: op
