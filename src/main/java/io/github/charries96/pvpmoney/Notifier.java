@@ -241,7 +241,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 					return true;
 				} else if (args[0].equalsIgnoreCase("update")) {
 					sender.sendMessage(ChatColor.GREEN + "Forcing plugin to look for updates..");
-					Updater updater = new Updater(this, 77878, this.getFile(), UpdateType.DEFAULT, false);
+					Updater updater = new Updater(this, 77878, this.getFile(), UpdateType.NO_VERSION_CHECK, false);
 					switch(updater.getResult()) {
 						case FAIL_DOWNLOAD:
 							sender.sendMessage(ChatColor.RED + "Update failed! :(");
