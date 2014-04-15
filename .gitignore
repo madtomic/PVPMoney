@@ -28,6 +28,11 @@ local.properties
 # PDT-specific
 .buildpath
 
+#################
+## Maven
+#################
++target
+
 
 #################
 ## Visual Studio
@@ -213,5 +218,3 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
-
-target/
