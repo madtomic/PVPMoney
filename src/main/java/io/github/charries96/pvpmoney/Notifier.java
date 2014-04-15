@@ -3,7 +3,8 @@ package io.github.charries96.pvpmoney;
 import java.io.IOException;
 
 import net.gravitydevelopment.updater.Updater;
-import net.gravitydevelopment.updater.Updater.*;
+import net.gravitydevelopment.updater.Updater.UpdateResult;
+import net.gravitydevelopment.updater.Updater.UpdateType;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.permission.Permission;
@@ -18,7 +19,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -37,6 +37,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 	private String currency = "£";
 	private String punishment = "50";
 	private String newFileName = "";
+	@SuppressWarnings("unused")
 	private Boolean notify = false;
 	private Boolean usePunishments = false;
 	private Boolean useRewards = false;
@@ -133,6 +134,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 		sendHelp(sender, "test", "Display messages users would see");
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label,
 			String[] args) {
