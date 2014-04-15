@@ -13,14 +13,15 @@ pvpmoney:
     auto-update: true
     prefix: '&4[&6PvPMoney&4]'
     rewards:
-        currency: £
+        enabled: true
+        currency: '£'
         amount: 50
         ranked: 100
     punishments:
         enabled: false
         amount: 50
-        message: '&4You were killed by &6%killer% &4and lost &c%currency%amount%!'
     messages:
         killer: '&4You killed &c%victim%&4 and got &a%currency%%amount%!'
         victim: '&4You were killed by &6%killer%!'
+        punished: '&4You were killed by &6%killer% &4and lost &c%currency%%amount%!'
         

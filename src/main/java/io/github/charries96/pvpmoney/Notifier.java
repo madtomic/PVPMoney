@@ -2,7 +2,6 @@ package io.github.charries96.pvpmoney;
 
 import java.io.IOException;
 
-import net.gravitydevelopment.updater.Updater;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.permission.Permission;
@@ -15,7 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -26,15 +25,16 @@ public final class Notifier extends JavaPlugin implements Listener {
     public static Economy economy = null;
     public static Permission permissions = null;
     
-    private String killmsg = "&4You killed &c%victim%&4 and got &a%currency%%amount%!";
-    private String deathmsg = "&4You were killed by %killer%!";
+    private String killmsg = "";
+    private String deathmsg = "";
+    private String punishmsg = "";
     private String value = "50";
     private String extra = "100";
     private String currency = "£";
     private String punishment = "50";
     private Boolean usePunishments = false;
-    private String punishmsg = "&4You were killed by &6%killer% &4and lost &c%currency%%amount%!";
-	
+    private Boolean useRewards = false;
+    
 	@Override
 	public void onEnable() {
 		this.saveDefaultConfig();
@@ -62,42 +62,30 @@ public final class Notifier extends JavaPlugin implements Listener {
 		}
 		
 		loadConfig();
-	
-		Updater updater = new Updater(this, 77878, this.getFile(), Updater.UpdateType.DEFAULT, true);
 
 	}
 	
 	private void loadConfig() {
+		prefix = getString("pvpmoney.prefix");
 		
-		if(this.getConfig().getString("pvpmoney.prefix") != "" && this.getConfig().getString("pvpmoney.prefix").length() >= 1)
-			prefix = this.getConfig().getString("pvpmoney.prefix");
+		currency = getString("pvpmoney.rewards.currency");
+		deathmsg = getString("pvpmoney.messages.victim");
+		extra = getString("pvpmoney.rewards.ranked");
+		killmsg = getString("pvpmoney.messages.killer");
+		punishment = getString("pvpmoney.punishments.amount");
+		punishmsg = getString("pvpmoney.messages.punished");
+		value = getString("pvpmoney.rewards.amount");
 		
-		if(this.getConfig().getString("pvpmoney.messages.killer") != "" && this.getConfig().getString("pvpmoney.messages.killer").length() >= 1)
-			killmsg = this.getConfig().getString("pvpmoney.messages.killer");
-		
-		if(this.getConfig().getString("pvpmoney.messages.victim") != "" && this.getConfig().getString("pvpmoney.messages.victim").length() >= 1)
-			deathmsg = this.getConfig().getString("pvpmoney.messages.victim");
-		
-		if(this.getConfig().getString("pvpmoney.rewards.amount") != "" && this.getConfig().getString("pvpmoney.rewards.amount").length() >= 1)
-			value = this.getConfig().getString("pvpmoney.rewards.amount");
-		
-		if(this.getConfig().getString("pvpmoney.rewards.currency") != "" && this.getConfig().getString("pvpmoney.rewards.currency").length() >= 1)
-			currency = this.getConfig().getString("pvpmoney.rewards.currency");
-		
-		if(this.getConfig().getString("pvpmoney.rewards.ranked") != "" && this.getConfig().getString("pvpmoney.rewards.ranked").length() >= 1)
-			extra = this.getConfig().getString("pvpmoney.rewards.ranked");
-		
-		if(this.getConfig().getBoolean("pvpmoney.punishments.enabled")) {
+		if(this.getConfig().getBoolean("pvpmoney.rewards.enabled"))
+			useRewards = true;
+		if(this.getConfig().getBoolean("pvpmoney.punishments.enabled"))
 			usePunishments = true;
-			
-			if(this.getConfig().getString("pvpmoney.punishments.amount") != "" && this.getConfig().getString("pvpmoney.punishments.amount").length() >= 1)
-				punishment = this.getConfig().getString("pvpmoney.punishments.amount");
-			
-			if(this.getConfig().getString("pvpmoney.punishments.message") != "" && this.getConfig().getString("pvpmoney.punishments.message").length() >= 1)
-				punishmsg = this.getConfig().getString("pvpmoney.punishments.message");
-		}
-		
-		getLogger().info("Loaded config.yml values");
+	}
+	
+	private String getString(String node) {
+		if(this.getConfig().getString(node) != "" && this.getConfig().getString(node).length() >= 1)
+			return this.getConfig().getString(node);
+		return "";
 	}
 
 	@Override
@@ -161,10 +149,14 @@ public final class Notifier extends JavaPlugin implements Listener {
 						if(args[1].equalsIgnoreCase("true")) {
 							usePunishments = true;
 							sender.sendMessage(ChatColor.GREEN + "Punishments Enabled.");
+							this.getConfig().set("pvpmoney.punishments.enable", usePunishments);
+							this.saveConfig();
 						}
 						else if(args[1].equalsIgnoreCase("false")) {
 							usePunishments = false;
 							sender.sendMessage(ChatColor.RED + "Punishments disabled.");
+							this.getConfig().set("pvpmoney.punishments.enable", usePunishments);
+							this.saveConfig();
 						}
 						else {
 							try {
@@ -198,9 +190,9 @@ public final class Notifier extends JavaPlugin implements Listener {
 	}
 	
 	public void spoof(CommandSender sender, String killer, String victim) {
-		sender.sendMessage(colourise(replaceValue(replaceCurrency(replaceVictim(replaceKiller(killmsg, killer), victim)), AMOUNT.Reward)));
-		sender.sendMessage(colourise(replaceValue(replaceCurrency(replaceVictim(replaceKiller(killmsg, killer), victim)), AMOUNT.Extra)));
-		sender.sendMessage(colourise(replaceValue(replaceCurrency(replaceVictim(replaceKiller(punishmsg, killer), victim)), AMOUNT.Punishment)));
+		sender.sendMessage(replaceValue(replaceCurrency(replaceVictim(colourise(killmsg), victim)), AMOUNT.Reward));
+		sender.sendMessage(replaceValue(replaceCurrency(replaceVictim(colourise(killmsg), victim)), AMOUNT.Extra));
+		sender.sendMessage(replaceValue(replaceCurrency(replaceKiller(colourise(punishmsg), killer)), AMOUNT.Punishment));
 		sender.sendMessage(colourise(replaceKiller(deathmsg, killer)));
 		sender.sendMessage(ChatColor.RED + replaceCurrency("Currency Symbol: %currency%"));
 		sender.sendMessage(ChatColor.RED + replaceValue("Regular Reward: %amount%", AMOUNT.Reward));
@@ -228,56 +220,68 @@ public final class Notifier extends JavaPlugin implements Listener {
 			String victimn = e.getEntity().getName();
 			// END: Get Killer & Victim name
 						
-			EconomyResponse r = null;
-			EconomyResponse p = null;
-			if(permissions.has(killer, "pvpmoney.extra"))
-				r = economy.depositPlayer(killern, Double.parseDouble(extra));
-			else
-				r = economy.depositPlayer(killern, Double.parseDouble(value));
 
 			// Tell our Victim about their death.
 			if(usePunishments) {
+				EconomyResponse p = null;
 				if(!permissions.has(victim, "pvpmoney.punishments.exempt")) {
 					p = economy.withdrawPlayer(victimn, Double.parseDouble(punishment));
 					if(p.transactionSuccess())
-						victim.sendMessage(colourise(prefix + " " + replaceValue(replaceKiller(punishmsg, killern), AMOUNT.Punishment)));
+						victim.sendMessage(prefix() + replaceCurrency(colourise(replaceValue(replaceKiller(punishmsg, killern), AMOUNT.Punishment))));
 					else
-						victim.sendMessage(colourise(prefix + " " + "&cError removing funds from your account."));
+						victim.sendMessage(prefix() + colourise("&cError removing funds from your account."));
+				} else {
+					victim.sendMessage(prefix() + colourise(replaceKiller(deathmsg, killern)));
 				}
-			} else {
-				victim.sendMessage(colourise(prefix + " " + replaceKiller(deathmsg, killern)));
-			}
-
-			if(r.transactionSuccess()) {
-				// Make the Killers day
-				if(permissions.has(killer, ""))
-					killer.sendMessage(replaceCurrency(colourise(prefix) + " " + replaceValue(replaceVictim(killmsg, victimn), AMOUNT.Extra)));
+			} 
+			
+			if(useRewards) {
+				EconomyResponse r = null;
+				
+				if(permissions.has(killer, "pvpmoney.extra"))
+					r = economy.depositPlayer(killern, Double.parseDouble(extra));
 				else
-					killer.sendMessage(replaceCurrency(colourise(prefix) + " " + replaceValue(replaceVictim(killmsg, victimn), AMOUNT.Reward)));
-            } else {
-            	// Oh no, better compensate them!
-            	killer.sendMessage(prefix + ChatColor.DARK_RED + " An error occured when rewarding you.");
-            	
-            	// Blame the Owner
-            	if((economy == null))
-            		killer.sendMessage(prefix + ChatColor.RED + " Ask your server administrator to install a Vault compatible economy.");
-            	
-            	// Give them a diamond to compensate
-            	killer.getInventory().addItem(new ItemStack(Material.DIAMOND, 1));
-            }
-			return;
+					r = economy.depositPlayer(killern, Double.parseDouble(value));
+				
+				if(r.transactionSuccess()) {
+					if(permissions.has(killer, "pvpmoney.extra"))
+						killer.sendMessage(replaceCurrency(prefix() + colourise(replaceValue(replaceVictim(killmsg, victimn), AMOUNT.Extra))));
+					else
+						killer.sendMessage(replaceCurrency(prefix() + colourise(replaceValue(replaceVictim(killmsg, victimn), AMOUNT.Reward))));
+					return;
+	            } else {
+	            	// Oh no, better compensate them!
+	            	killer.sendMessage(prefix() + ChatColor.DARK_RED + " An error occured when rewarding you.");
+	            	
+	            	// Blame the Owner
+	            	if((economy == null))
+	            		killer.sendMessage(prefix() + ChatColor.RED + " Ask your server administrator to install a Vault compatible economy.");
+	            	
+	            	// Give them a diamond to compensate
+	            	killer.getInventory().addItem(new ItemStack(Material.DIAMOND, 1));
+	            }
+			}
 		}
 		return;
+	}
+	
+	private String prefix() {
+		return colourise(prefix) + " "; 
 	}
 		
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e)
 	{
-		e.getPlayer().sendMessage(colourise(prefix) + ChatColor.GRAY + " PvPMoney Enabled");
+		e.getPlayer().sendMessage(prefix() + ChatColor.GRAY + " PvPMoney Enabled");
 	}
 		
 	public String colourise(String str) {
-		return ChatColor.translateAlternateColorCodes('&', str);
+		if(!str.isEmpty() || str != null)
+			if(str.contains("&"))
+				return ChatColor.translateAlternateColorCodes('&', str);
+			if(str.contains("§"))
+				return ChatColor.translateAlternateColorCodes('§', str);
+		return str;
 	}
 	
 	public String replaceKiller(String str, String name) {
@@ -307,6 +311,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 			case Extra:
 				return str.replace("%amount%", this.extra);
 			default:
+				getLogger().warning("Could not replace amount variable.");
 				return str;
 		}
 	}
