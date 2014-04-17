@@ -350,7 +350,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 	public void onJoin(PlayerJoinEvent e) {
 		e.getPlayer().sendMessage(
 				prefix() + ChatColor.GRAY + "PvPMoney Enabled");
-		if(permissions.has(e.getPlayer(), "pvpmoney.admin")) {
+		if(permissions.has(e.getPlayer(), "pvpmoney.admin") && notify) {
 			e.getPlayer().sendMessage(prefix() + ChatColor.GREEN + newFileName + " is now available, run \"/pvpmoney update\" to install it.");
 		}
 	}
