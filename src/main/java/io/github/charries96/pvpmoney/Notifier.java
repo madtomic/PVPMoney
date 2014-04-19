@@ -34,7 +34,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 	private String punishmsg = "";
 	private String value = "50";
 	private String extra = "100";
-	private String currency = "£";
+	private String currency = "";
 	private String punishment = "50";
 	private String newFileName = "";
 	private Boolean notify = false;
@@ -359,8 +359,6 @@ public final class Notifier extends JavaPlugin implements Listener {
 		if (!str.isEmpty() || str != null)
 			if (str.contains("&"))
 				return ChatColor.translateAlternateColorCodes('&', str);
-		if (str.contains("§"))
-			return ChatColor.translateAlternateColorCodes('§', str);
 		return str;
 	}
 
