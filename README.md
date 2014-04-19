@@ -1,4 +1,4 @@
-PVPMoney [![Build Status](https://secure.travis-ci.org/charries96/PVPMoney.svg)](http://travis-ci.org/charries96/PVPMoney)
+PVPMoney [![Build Status](https://travis-ci.org/charries96/PVPMoney.svg?branch=master)](https://travis-ci.org/charries96/PVPMoney)
 ========
 
 Rewards users for killing other players!
