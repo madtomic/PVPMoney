@@ -37,7 +37,6 @@ public final class Notifier extends JavaPlugin implements Listener {
 	private String currency = "£";
 	private String punishment = "50";
 	private String newFileName = "";
-	@SuppressWarnings("unused")
 	private Boolean notify = false;
 	private Boolean usePunishments = false;
 	private Boolean useRewards = false;
@@ -251,6 +250,7 @@ public final class Notifier extends JavaPlugin implements Listener {
 		return false;
 	}
 
+	@SuppressWarnings("unused")
 	public void spoof(CommandSender sender) {
 		String name = sender.getName();
 		
