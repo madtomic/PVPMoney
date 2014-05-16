@@ -2,9 +2,6 @@ package io.github.charries96.pvpmoney;
 
 import java.io.IOException;
 
-import net.gravitydevelopment.updater.Updater;
-import net.gravitydevelopment.updater.Updater.UpdateResult;
-import net.gravitydevelopment.updater.Updater.UpdateType;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.permission.Permission;
@@ -17,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,11 +32,8 @@ public final class Notifier extends JavaPlugin implements Listener {
 	private String extra = "100";
 	private String currency = "";
 	private String punishment = "50";
-	private String newFileName = "";
-	private Boolean notify = false;
 	private Boolean usePunishments = false;
 	private Boolean useRewards = false;
-	private Boolean canUpdate = false;
 
 	@Override
 	public void onEnable() {
@@ -72,13 +65,6 @@ public final class Notifier extends JavaPlugin implements Listener {
 
 		loadConfig();
 
-		if(canUpdate) {
-			Updater updater = new Updater(this, 77878, this.getFile(), UpdateType.NO_DOWNLOAD, false);
-			if (updater.getResult() == UpdateResult.UPDATE_AVAILABLE) {
-			    newFileName = updater.getLatestName();
-			    notify = true;
-			} 
-		}
 	}
 
 	private void loadConfig() {
@@ -92,8 +78,6 @@ public final class Notifier extends JavaPlugin implements Listener {
 		punishmsg = getString("pvpmoney.messages.punished");
 		value = getString("pvpmoney.rewards.amount");
 
-		if (this.getConfig().getBoolean("pvpmoney.can-update"))
-			canUpdate = true;
 		if (this.getConfig().getBoolean("pvpmoney.rewards.enabled"))
 			useRewards = true;
 		if (this.getConfig().getBoolean("pvpmoney.punishments.enabled"))
@@ -122,7 +106,6 @@ public final class Notifier extends JavaPlugin implements Listener {
 		sendHelp(sender, "test", "Display messages users would see");
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label,
 			String[] args) {
@@ -226,24 +209,12 @@ public final class Notifier extends JavaPlugin implements Listener {
 					} else if (args[0].equalsIgnoreCase("test")) {
 						spoof(sender);
 						return true;
-					} else if (args[0].equalsIgnoreCase("update")) {
-						sender.sendMessage(ChatColor.GREEN + "Forcing plugin to look for updates..");
-						Updater updater = new Updater(this, 77878, this.getFile(), UpdateType.NO_VERSION_CHECK, true);
-						switch(updater.getResult()) {
-							case FAIL_DOWNLOAD:
-								sender.sendMessage(ChatColor.RED + "Update failed! :(");
-								break;
-							case SUCCESS:
-								sender.sendMessage(ChatColor.GREEN + "Plugin updated successfully!");
-								sender.sendMessage(prefix() + ChatColor.GREEN + "Changes will take effect after a reload.");
-								break;
-						}
+					} 
 					} else {
 						doHelp(sender);
 						return false;
 					}
 				}
-			}
 		} else {
 			sender.sendMessage(ChatColor.RED + "You do not have permission to do this.");
 		}
@@ -344,15 +315,6 @@ public final class Notifier extends JavaPlugin implements Listener {
 
 	private String prefix() {
 		return colourise(prefix) + " ";
-	}
-
-	@EventHandler
-	public void onJoin(PlayerJoinEvent e) {
-		e.getPlayer().sendMessage(
-				prefix() + ChatColor.GRAY + "PvPMoney Enabled");
-		if(permissions.has(e.getPlayer(), "pvpmoney.admin") && notify) {
-			e.getPlayer().sendMessage(prefix() + ChatColor.GREEN + newFileName + " is now available, run \"/pvpmoney update\" to install it.");
-		}
 	}
 
 	public String colourise(String str) {

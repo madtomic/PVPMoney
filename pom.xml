@@ -3,12 +3,23 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.github.charries96</groupId>
 	<artifactId>PVPMoney</artifactId>
-	<version>0.6.2b</version>
+	<version>0.6.2d</version>
+	<distributionManagement>
+		<repository>
+			<id>repo</id>
+			<url>https://github.com/charries96/PVPMoney/raw/master/dist/</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshot-repo</id>
+			<url>https://github.com/charries96/PVPMoney/raw/master/dist/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
