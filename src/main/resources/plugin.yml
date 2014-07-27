@@ -1,24 +1,17 @@
-name: PvPMoney
-version: 0.6.2c
+name: PVPMoney
+version: 0.7
 description: Reward players for PVP kills.
 author: charries96
-main: io.github.charries96.pvpmoney.Notifier
-depend: [Vault]
-prefix: PvPMoney
+main: com.frostcore.pvpmoney.PVPMoney
+softdepend: [Vault]
 commands:
-    pvpmoney:
-        description: Modify PvPMoney variables
-        aliases: pvpm
+  pvpmoney:
+    description: PVPMoney administration command.
+    aliases: [pvpm]
 permissions:
-    pvpmoney.reward:
-        description: Give players money for their kills.
-        default: true
-    pvpmoney.extra:
-        description: Give players extra money.
-        default: op
-    pvpmoney.admin:
-        description: Allow players to edit PvPMoney variables using commands.
-        default: op
-    pvpmoney.punishments.exempt:
-        description: No money taken on death
-        default: op
+  pvpmoney.rewards:
+    default: true
+  pvpmoney.admin:
+    default: op
+  pvpmoney.exempt:
+    default: op
