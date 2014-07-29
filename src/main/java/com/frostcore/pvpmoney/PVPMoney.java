@@ -53,9 +53,7 @@ public final class PVPMoney extends JavaPlugin {
 
         try {
             Metrics metrics = new Metrics(this);
-            metrics.start();
 
-            getLogger().info("Yay, Metrics started successfully!");
 
             Metrics.Graph deathGraph = metrics.createGraph("Bloody Deaths");
             deathGraph.addPlotter(new Metrics.Plotter() {
@@ -80,6 +78,8 @@ public final class PVPMoney extends JavaPlugin {
                     return (int)LOST;
                 }
             });
+            metrics.start();
+            getLogger().info("Yay, Metrics started successfully!");
 
         } catch (IOException e) {
             getLogger().info("Metrics could not be enabled. :(");
