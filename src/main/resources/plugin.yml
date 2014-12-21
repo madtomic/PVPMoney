@@ -3,7 +3,7 @@ version: #VERSION#
 description: reward players for killing others
 author: Albion
 main: de.albionco.pvpmoney.MoneyPlugin
-softdepend: [Vault]
+depend: [Vault]
 commands:
   pvpmoney:
     description: command to control various aspects of the plugin

@@ -102,7 +102,10 @@ public class MoneyPlugin extends JavaPlugin {
      */
     private boolean setupEconomy() {
         RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(Economy.class);
-        return ((Statics.ECONOMY = economyProvider.getProvider()) != null);
+        if(economyProvider != null) {
+            Statics.ECONOMY = economyProvider.getProvider();
+        }
+        return Statics.ECONOMY != null;
     }
 
     @Override

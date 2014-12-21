@@ -13,6 +13,7 @@ public class Dictionary {
         if (args.length % 2 == 0) {
 
             input = input.replace("{{ PREFIX }}", Statics.MESSAGE_PREFIX + " ");
+            input = input.replace("{{ CURRENCY }}", Statics.MONEY_CURRENCY);
 
             for (int i = 0; i < args.length; i += 2) {
                 input = input.replace("{{ " + args[i].toUpperCase() + " }}", args[i + 1]);

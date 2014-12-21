@@ -27,7 +27,7 @@ public class Commands {
         }
 
         Statics.MONEY_BASIC = args.getDouble(0);
-        sender.sendMessage(Dictionary.format(Statics.ADMIN_MONEY_UPDATE, "AMOUNT", String.valueOf(Statics.MONEY_BASIC), "CURRENCY", Statics.MONEY_CURRENCY));
+        sender.sendMessage(Dictionary.format(Statics.ADMIN_MONEY_UPDATE, "AMOUNT", String.valueOf(Statics.MONEY_BASIC)));
     }
 
     @Command(
@@ -42,7 +42,7 @@ public class Commands {
         }
 
         Statics.MONEY_EXTRA = args.getDouble(0);
-        sender.sendMessage(Dictionary.format(Statics.ADMIN_MONEY_UPDATE, "AMOUNT", String.valueOf(Statics.MONEY_EXTRA), "CURRENCY", Statics.MONEY_CURRENCY));
+        sender.sendMessage(Dictionary.format(Statics.ADMIN_MONEY_UPDATE, "AMOUNT", String.valueOf(Statics.MONEY_EXTRA)));
     }
 
     @Command(
@@ -95,6 +95,7 @@ public class Commands {
     }
 
     public static class ParentCommand {
+        @Console
         @Command(
                 aliases = { "pvpmoney", "pvpm" },
                 desc = "Administration command",
