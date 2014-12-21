@@ -37,8 +37,7 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
-                                    <include>net.gravitydevelopment.updater:updater</include>
-                                    <include>org.mcstats.bukkit:metrics</include>
+                                    <include>org.mcstats.*:*</include>
                                     <include>com.sk89q:command-framework-bukkit</include>
                                 </includes>
                             </artifactSet>
@@ -46,6 +45,10 @@
                                 <relocation>
                                     <pattern>org.mcstats</pattern>
                                     <shadedPattern>de.albionco.stats</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.sk89q</pattern>
+                                    <shadedPattern>de.albionco.framework</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

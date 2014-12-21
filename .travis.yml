@@ -1,0 +1,14 @@
+language: java
+jdk:
+  - oraclejdk7
+  - openjdk7
+deploy:
+  provider: releases
+  api_key:
+    secure: nLY1IYuqmCBS40GmIzGhnHFd3OPQOPvlu1hs+IFZgu4h00aPRcWm23J7141LpNLa2GUu8QQUuLBsc2ocf/YFkXu+GL+LItCue/nKHx/VAsl4nSJRJ/bd+kzaoOzir/YXLS+k7Fp5r6NYw74naSvooEA0USmPc4NUpezSF8Mib48=
+  file: target/PVPMoney.jar
+  on:
+    repo: Albioncode/PVPMoney
+    all_branches: true
+    jdk: oraclejdk7
+    tags: true
