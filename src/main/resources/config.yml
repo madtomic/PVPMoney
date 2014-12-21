@@ -1,29 +1,13 @@
-# PVPMoney by charries96
-# Simple plugin to give money for killing other players
-# Originally developed for my home server, but realised the potential given other similar plugins are broken
-# 
-# Variables:
-#   %killer%    is automatically replaced with the name of the killer
-#   %victim%    is automatically replaced with the name of the victim
-#   %currency%  is automatically replaced with whatever your currency symbol is
-#   %amount%    is automatically replaced with how much money the killer gets
-#
-# Giving the users the "pvpmoney.bonus" node will give them the sum of amount & bonus
-#
-# For a full list of variables and where you can use them please see the wiki at the following URL:
-# http://github.com/charries96/PVPMoney/wiki
-
-pvpmoney:
-    prefix: '&8[&6PVPMoney&8]&6'
-    rewards:
-        enabled: true
-        currency: '$'
-        amount: 50
-        bonus: 50
-    punishments:
-        enabled: false
-        amount: 10
-    messages:
-        killer: '&4You killed &c%victim%&4 and got &a%currency%%amount%!'
-        victim: '&4You were killed by &6%killer%!'
-        punished: '&4You were killed by &6%killer% &4and lost &c%currency%%amount%!'
+prefix: '&8[&6PVPMoney&8]&6'
+rewards:
+    enabled: true
+    currency: '$'
+    amount: 50
+    bonus: 50
+punishments:
+    enabled: false
+    amount: 10
+messages:
+    killer: '&7You killed &a{{ VICTIM }}&7 and got &a{{ CURRENCY }}{{ AMOUNT }}&7!'
+    victim: '&7You were killed by &a{{ KILLER }}&7!'
+    punished: '&7You were killed by &a{{ KILLER }}&7 and lost &a{{ CURRENCY }}{{ AMOUNT }}!'

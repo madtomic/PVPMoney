@@ -1,12 +1,12 @@
 name: PVPMoney
-version: 0.7
-description: Reward players for PVP kills.
-author: charries96
-main: com.frostcore.pvpmoney.PVPMoney
+version: #VERSION#
+description: reward players for killing others
+author: Albion
+main: de.albionco.pvpmoney.MoneyPlugin
 softdepend: [Vault]
 commands:
   pvpmoney:
-    description: PVPMoney administration command.
+    description: command to control various aspects of the plugin
     aliases: [pvpm]
 permissions:
   pvpmoney.rewards:
