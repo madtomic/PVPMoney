@@ -9,6 +9,10 @@ import net.milkbowl.vault.economy.Economy;
  */
 public class Statics {
 
+    private Statics() {
+
+    }
+
     /**
      * Permission used to allow players to receive rewards
      */
@@ -45,7 +49,7 @@ public class Statics {
     public static String MESSAGE_KILLER = "&7You were killed by &a{{ KILLER }} &7and lost &a{{ CURRENCY }}{{ AMOUNT }}&7!";
 
     /**
-     * Message displayed to players when they are punished, overrides #MESSAGE_DEATH
+     * Message displayed to players when they are punished, overrides {@link #MESSAGE_DEATH}
      */
     public static String MESSAGE_PUNISHED = "&7You were killed by &a{{ KILLER }} &7and lost &a{{ CURRENCY }}{{ AMOUNT }}&7!";
 
@@ -100,7 +104,7 @@ public class Statics {
     public static Economy ECONOMY = null;
 
     /**
-     * Message sent back to the sender when #MONEY_BASIC is updated
+     * Message sent back to the sender when {@link #MONEY_BASIC} is updated
      */
     public static String ADMIN_MONEY_UPDATE = "{{ PREFIX }} Value set to: {{ CURRENCY }}{{ AMOUNT }}";
 
