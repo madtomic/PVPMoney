@@ -26,7 +26,7 @@ public class Statics {
     /**
      * Permission used to allow players to edit features of the plugin
      */
-    public final static String PERMISSION_ADMIN = "pvpmoney.extra";
+    public final static String PERMISSION_ADMIN = "pvpmoney.admin";
 
     /**
      * Permission used to bypass punishments
