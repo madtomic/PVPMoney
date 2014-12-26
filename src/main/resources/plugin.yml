@@ -11,6 +11,8 @@ commands:
 permissions:
   pvpmoney.rewards:
     default: true
+  pvpmoney.extra:
+    default: false
   pvpmoney.admin:
     default: op
   pvpmoney.exempt:
