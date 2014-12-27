@@ -24,7 +24,7 @@ public class PlayerListenerTest {
 
     @Test
     public void testPayments() throws Exception {
-        Economy economy = mockEconomy();
+        Statics.ECONOMY = mockEconomy();
 
         /*
          * Setup our killer and victim
@@ -42,13 +42,13 @@ public class PlayerListenerTest {
         /*
          * Setup our listener
          */
-        PlayerListener listener = new PlayerListener(economy);
+        PlayerListener listener = new PlayerListener();
         listener.playerKilledPlayer(event);
 
         /*
          * Verify the listener tried to deposit the value of Statics.MONEY_BASIC
          */
-        verify(economy, only()).depositPlayer(killer, Statics.MONEY_BASIC);
+        verify(Statics.ECONOMY, only()).depositPlayer(killer, Statics.MONEY_BASIC);
 
         /*
          * Setup our new killer and victim players
@@ -71,12 +71,12 @@ public class PlayerListenerTest {
         /*
          * Verify the listener tried to deposit the value of Statics.MONEY_EXTRA
          */
-        verify(economy, atLeastOnce()).depositPlayer(killerTwo, Statics.MONEY_EXTRA);
+        verify(Statics.ECONOMY, atLeastOnce()).depositPlayer(killerTwo, Statics.MONEY_EXTRA);
     }
 
     @Test
     public void testExemption() throws Exception {
-        Economy economy = mockEconomy();
+        Statics.ECONOMY = mockEconomy();
 
         Player killer = mockKiller();
         Player victim = mockVictim(killer);
@@ -85,10 +85,10 @@ public class PlayerListenerTest {
         PlayerDeathEvent event = mock(PlayerDeathEvent.class);
         when(event.getEntity()).thenReturn(victim);
 
-        PlayerListener listener = new PlayerListener(economy);
+        PlayerListener listener = new PlayerListener();
         listener.playerKilledPlayer(event);
 
-        verify(economy, never()).withdrawPlayer(victim, Statics.MONEY_PUNISH);
+        verify(Statics.ECONOMY, never()).withdrawPlayer(victim, Statics.MONEY_PUNISH);
     }
 
     /**

@@ -20,16 +20,7 @@ import java.util.logging.Level;
 @SuppressWarnings("unused")
 public final class PlayerListener implements Listener {
 
-    private final Economy economy;
-
-    /**
-     * Allow unit testing by passing the economy object to the constructor
-     *
-     * @param economy economy to use
-     */
-    public PlayerListener(Economy economy) {
-        this.economy = economy;
-    }
+    private final Economy economy = Statics.ECONOMY;
 
     @EventHandler
     public void playerKilledPlayer(PlayerDeathEvent event) {

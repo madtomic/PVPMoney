@@ -97,7 +97,7 @@ public class MoneyPlugin extends JavaPlugin {
          * Fix the player listener not registering correctly,
          * thanks to @Live4Redline on GitHub for reporting.
          */
-        getServer().getPluginManager().registerEvents(new PlayerListener(Statics.ECONOMY), this);
+        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
     }
 
     /**
