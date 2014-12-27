@@ -7,8 +7,8 @@ import de.albionco.pvpmoney.Statics;
 import org.bukkit.command.CommandSender;
 
 /**
- * Description: part of PVPMoney
- * Created at: {12:21} on {27/07/2014}
+ * First time using sk89q's command framework, don't judge me.
+ * Not 100% pleased at the result but not unhappy either.
  *
  * @author Connor Spencer Harries
  */

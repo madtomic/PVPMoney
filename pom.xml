@@ -45,11 +45,11 @@
                             <relocations>
                                 <relocation>
                                     <pattern>org.mcstats</pattern>
-                                    <shadedPattern>de.albionco.stats</shadedPattern>
+                                    <shadedPattern>de.albionco.libs.stats</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.sk89q</pattern>
-                                    <shadedPattern>de.albionco.framework</shadedPattern>
+                                    <shadedPattern>de.albionco.libs.framework</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

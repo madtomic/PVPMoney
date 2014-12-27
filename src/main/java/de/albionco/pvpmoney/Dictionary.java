@@ -3,7 +3,7 @@ package de.albionco.pvpmoney;
 import org.bukkit.ChatColor;
 
 /**
- * Created by Connor Harries on 21/12/2014.
+ * Simple utility class to provide String formatting methods
  *
  * @author Connor Spencer Harries
  */
