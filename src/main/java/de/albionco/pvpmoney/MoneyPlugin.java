@@ -5,7 +5,6 @@ import com.sk89q.minecraft.util.commands.*;
 import de.albionco.pvpmoney.command.Commands;
 import de.albionco.pvpmoney.event.PlayerListener;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -23,6 +22,7 @@ import java.io.IOException;
  */
 public class MoneyPlugin extends JavaPlugin {
 
+    private static MoneyPlugin instance;
     private CommandsManager<CommandSender> commands;
 
     /**
@@ -31,11 +31,12 @@ public class MoneyPlugin extends JavaPlugin {
      * @return {@link MoneyPlugin}
      */
     public static MoneyPlugin getInstance() {
-        return (MoneyPlugin) Bukkit.getPluginManager().getPlugin("PVPMoney");
+        return instance;
     }
 
     @Override
     public void onEnable() {
+        instance = this;
         this.saveDefaultConfig();
 
         if (setupEconomy()) {
@@ -92,7 +93,11 @@ public class MoneyPlugin extends JavaPlugin {
         CommandsManagerRegistration commands = new CommandsManagerRegistration(this, this.commands);
         commands.register(Commands.ParentCommand.class);
 
-        PlayerListener.create();
+        /*
+         * Fix the player listener not registering correctly,
+         * thanks to @Live4Redline on GitHub for reporting.
+         */
+        getServer().getPluginManager().registerEvents(new PlayerListener(Statics.ECONOMY), this);
     }
 
     /**
