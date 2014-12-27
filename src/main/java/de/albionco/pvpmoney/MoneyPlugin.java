@@ -145,16 +145,10 @@ public class MoneyPlugin extends JavaPlugin {
         Statics.ENABLE_PUNISHMENT = getConfig().getBoolean("punishments.enable", false);
         Statics.MONEY_CURRENCY = getConfig().getString("rewards.currency", "$");
         Statics.MESSAGE_DEATH = getConfig().getString("messages.victim", "&7You were killed by &a{{ KILLER }}&7!");
-
-        if (Statics.ENABLE_REWARD) {
-            Statics.MESSAGE_KILLER = getConfig().getString("messages.killer", "&7You killed &a{{ VICTIM }}&7 and got &a{{ CURRENCY }}{{ AMOUNT }}&7!");
-            Statics.MONEY_BASIC = getConfig().getDouble("rewards.amount", 50.00);
-            Statics.MONEY_EXTRA = getConfig().getDouble("rewards.bonus", 100.00);
-        }
-
-        if (Statics.ENABLE_PUNISHMENT) {
-            Statics.MESSAGE_PUNISHED = getConfig().getString("messages.punished", "&7You were killed by &a{{ KILLER }}&7 and lost &a{{ CURRENCY }}{{ AMOUNT }}!");
-            Statics.MONEY_PUNISH = getConfig().getDouble("punishments.amount", 10.00);
-        }
+        Statics.MESSAGE_KILLER = getConfig().getString("messages.killer", "&7You killed &a{{ VICTIM }}&7 and got &a{{ CURRENCY }}{{ AMOUNT }}&7!");
+        Statics.MONEY_BASIC = getConfig().getDouble("rewards.amount", 50.00);
+        Statics.MONEY_EXTRA = getConfig().getDouble("rewards.bonus", 100.00);
+        Statics.MESSAGE_PUNISHED = getConfig().getString("messages.punished", "&7You were killed by &a{{ KILLER }}&7 and lost &a{{ CURRENCY }}{{ AMOUNT }}!");
+        Statics.MONEY_PUNISH = getConfig().getDouble("punishments.amount", 10.00);
     }
 }
