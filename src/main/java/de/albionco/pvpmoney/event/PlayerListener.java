@@ -2,8 +2,6 @@ package de.albionco.pvpmoney.event;
 
 import de.albionco.pvpmoney.Dictionary;
 import de.albionco.pvpmoney.MoneyPlugin;
-import de.albionco.pvpmoney.Statics;
-import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,6 +10,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.logging.Level;
 
+import static de.albionco.pvpmoney.Statics.*;
+
 /**
  * Subscribe to {@link org.bukkit.event.entity.PlayerDeathEvent} so that we can do our thing.
  *
@@ -19,8 +19,6 @@ import java.util.logging.Level;
  */
 @SuppressWarnings("unused")
 public final class PlayerListener implements Listener {
-
-    private final Economy economy = Statics.ECONOMY;
 
     @EventHandler
     public void playerKilledPlayer(PlayerDeathEvent event) {
@@ -32,30 +30,30 @@ public final class PlayerListener implements Listener {
             if(event.getEntity().getKiller() != event.getEntity()) {
                 Player victim = event.getEntity();
                 Player killer = victim.getKiller();
-                Statics.METRICS_DEATHS++;
+                METRICS_DEATHS++;
 
-                if (Statics.ENABLE_REWARD) {
-                    if (killer.hasPermission(Statics.PERMISSION_BASIC) || killer.hasPermission(Statics.PERMISSION_EXTRA)) {
-                        boolean bonus = killer.hasPermission(Statics.PERMISSION_EXTRA);
-                        double amount = bonus ? Statics.MONEY_EXTRA : Statics.MONEY_BASIC;
-                        EconomyResponse r = economy.depositPlayer(killer, amount);
+                if (ENABLE_REWARD) {
+                    if (killer.hasPermission(PERMISSION_BASIC) || killer.hasPermission(PERMISSION_EXTRA)) {
+                        boolean bonus = killer.hasPermission(PERMISSION_EXTRA);
+                        double amount = bonus ? MONEY_EXTRA : MONEY_BASIC;
+                        EconomyResponse r = ECONOMY.depositPlayer(killer, amount);
 
                         if (r.transactionSuccess()) {
-                            Statics.METRICS_PAID += amount;
-                            killer.sendMessage(Dictionary.format(Statics.MESSAGE_KILLER, "KILLER", killer.getName(), "VICTIM", victim.getName(), "AMOUNT", String.valueOf(amount)));
+                            METRICS_PAID += amount;
+                            killer.sendMessage(Dictionary.format(MESSAGE_KILLER, "KILLER", killer.getName(), "VICTIM", victim.getName(), "AMOUNT", String.valueOf(amount)));
                         } else {
                             MoneyPlugin.getInstance().getLogger().log(Level.WARNING, "Unable to pay {0} player for their kill", killer.getName());
                         }
                     }
                 }
 
-                if (Statics.ENABLE_PUNISHMENT) {
-                    if (!victim.hasPermission(Statics.PERMISSION_EXEMPT)) {
-                        EconomyResponse p = economy.withdrawPlayer(victim, Statics.MONEY_PUNISH);
+                if (ENABLE_PUNISHMENT) {
+                    if (!victim.hasPermission(PERMISSION_EXEMPT)) {
+                        EconomyResponse p = ECONOMY.withdrawPlayer(victim, MONEY_PUNISH);
 
                         if (p.transactionSuccess()) {
-                            Statics.METRICS_PUNISHED += Statics.MONEY_PUNISH;
-                            victim.sendMessage(Dictionary.format(Statics.MESSAGE_PUNISHED, "KILLER", killer.getName(), "VICTIM", victim.getName(), "AMOUNT", String.valueOf(Statics.MONEY_PUNISH)));
+                            METRICS_PUNISHED += MONEY_PUNISH;
+                            victim.sendMessage(Dictionary.format(MESSAGE_PUNISHED, "KILLER", killer.getName(), "VICTIM", victim.getName(), "AMOUNT", String.valueOf(MONEY_PUNISH)));
                         } else {
                             MoneyPlugin.getInstance().getLogger().log(Level.WARNING, "Unable to withdraw money from {0}'s account", victim.getName());
                         }
@@ -64,7 +62,7 @@ public final class PlayerListener implements Listener {
                     return;
                 }
 
-                victim.sendMessage(Dictionary.format(Statics.MESSAGE_DEATH, "KILLER", killer.getName(), "VICTIM", victim.getName()));
+                victim.sendMessage(Dictionary.format(MESSAGE_DEATH, "KILLER", killer.getName(), "VICTIM", victim.getName()));
             }
         }
     }
