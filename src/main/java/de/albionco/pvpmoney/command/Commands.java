@@ -17,7 +17,7 @@ public class Commands {
 
     @Command(
             aliases = { "money", "setmoney" },
-            desc = "Edit the amount of money per kill.",
+            desc = "edit the amount of money per kill.",
             usage = "<amount>",
             min = 1
     )
@@ -32,7 +32,7 @@ public class Commands {
 
     @Command(
             aliases = { "bonus", "setbonus" },
-            desc = "Edit the ranked amount of money per kill.",
+            desc = "edit the ranked amount of money per kill.",
             usage = "<amount>",
             min = 1
     )
@@ -47,7 +47,7 @@ public class Commands {
 
     @Command(
             aliases = { "reload", "rl" },
-            desc = "Reload configuration file."
+            desc = "reload configuration file."
     )
     public static void reload(final CommandContext args, CommandSender sender) throws Exception {
         if (!sender.hasPermission(Statics.PERMISSION_ADMIN)) {
@@ -61,7 +61,7 @@ public class Commands {
 
     @Command(
             aliases = { "test" },
-            desc = "Test plugin configuration."
+            desc = "test plugin configuration."
     )
     public static void test(final CommandContext args, CommandSender sender) throws Exception {
         if (!sender.hasPermission(Statics.PERMISSION_ADMIN)) {
@@ -75,7 +75,7 @@ public class Commands {
 
     @Command(
             aliases = { "toggle" },
-            desc = "Toggle rewards and punishments",
+            desc = "toggle rewards and punishments",
             usage = "<rewards|punishments>",
             min = 1
     )
@@ -98,7 +98,7 @@ public class Commands {
         @Console
         @Command(
                 aliases = { "pvpmoney", "pvpm" },
-                desc = "Administration command",
+                desc = "administration command for PVPMoney",
                 min = 0
         )
         @NestedCommand(Commands.class)

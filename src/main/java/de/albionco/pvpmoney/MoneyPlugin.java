@@ -14,6 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.mcstats.Metrics;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
 /**
  * Core of the PVPMoney plugin
@@ -74,13 +75,17 @@ public class MoneyPlugin extends JavaPlugin {
                 }
             });
 
+            if (Statics.DEBUG) {
+                getLogger().log(Level.INFO, "Configured metrics service, about to start");
+            }
+
             if (metrics.start()) {
-                getLogger().info("Metrics service started succesfully");
+                getLogger().log(Level.INFO, "Metrics service started succesfully");
             } else {
-                getLogger().info("Metrics could not be enabled");
+                getLogger().log(Level.INFO, "Metrics could not be enabled");
             }
         } catch (IOException e) {
-            getLogger().info("Metrics could not be enabled");
+            getLogger().log(Level.WARNING, "Metrics could not be enabled");
         }
 
         this.commands = new CommandsManager<CommandSender>() {
@@ -98,6 +103,9 @@ public class MoneyPlugin extends JavaPlugin {
          * thanks to @Live4Redline on GitHub for reporting.
          */
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        if (Statics.DEBUG) {
+            getLogger().log(Level.INFO, "Registered event listener");
+        }
     }
 
     /**
@@ -109,6 +117,9 @@ public class MoneyPlugin extends JavaPlugin {
         RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(Economy.class);
         if(economyProvider != null) {
             Statics.ECONOMY = economyProvider.getProvider();
+        }
+        if (Statics.DEBUG) {
+            getLogger().log(Level.INFO, "Setting up vault economy");
         }
         return Statics.ECONOMY != null;
     }
@@ -128,7 +139,7 @@ public class MoneyPlugin extends JavaPlugin {
             if (e.getCause() instanceof NumberFormatException) {
                 sender.sendMessage(ChatColor.RED + "Number expected, string received instead.");
             } else {
-                sender.sendMessage(ChatColor.RED + "An unknown error occured executing that command, please contact an administrator.");
+                sender.sendMessage(ChatColor.RED + "An unknown error occurred executing that command, please contact an administrator.");
                 e.printStackTrace();
             }
         } catch (CommandException e) {
@@ -141,6 +152,7 @@ public class MoneyPlugin extends JavaPlugin {
      * Simple method to load config values.
      */
     public void init() {
+        Statics.DEBUG = getConfig().getBoolean("debug", false);
         Statics.ENABLE_REWARD = getConfig().getBoolean("rewards.enable", true);
         Statics.ENABLE_PUNISHMENT = getConfig().getBoolean("punishments.enable", false);
         Statics.MONEY_CURRENCY = getConfig().getString("rewards.currency", "$");

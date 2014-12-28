@@ -1,3 +1,4 @@
+debug: false
 prefix: '&8[&6PVPMoney&8]&6'
 rewards:
     enabled: true

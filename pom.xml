@@ -69,7 +69,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <file>${basedir}/target/classes/plugin.yml</file>
+                    <file>target/classes/plugin.yml</file>
                     <replacements>
                         <replacement>
                             <token>#VERSION#</token>

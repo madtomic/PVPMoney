@@ -9,11 +9,18 @@ commands:
     description: command to control various aspects of the plugin
     aliases: [pvpm]
 permissions:
-  pvpmoney.rewards:
+  pvpmoney.*:
+    default: false
+    children:
+      pvpmoney.basic: true
+      pvpmoney.extra: true
+      pvpmoney.admin: true
+      pvpmoney.exempt: true
+  pvpmoney.basic:
     default: true
   pvpmoney.extra:
     default: false
-  pvpmoney.admin:
-    default: op
   pvpmoney.exempt:
+    default: false
+  pvpmoney.admin:
     default: op
