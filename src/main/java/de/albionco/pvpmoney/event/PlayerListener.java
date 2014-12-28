@@ -32,7 +32,7 @@ public class PlayerListener implements Listener {
              */
             if(event.getEntity().getKiller() != event.getEntity()) {
                 if (DEBUG) {
-                    getInstance().getLogger().log(Level.INFO, "Player {0}\'s death was not suicide");
+                    getInstance().getLogger().log(Level.INFO, "Player {0}\'s death was not suicide", event.getEntity().getName());
                 }
 
                 Player victim = event.getEntity();
@@ -50,8 +50,7 @@ public class PlayerListener implements Listener {
 
                 if (ENABLE_REWARD) {
                     if (killer.hasPermission(PERMISSION_BASIC) || killer.hasPermission(PERMISSION_EXTRA)) {
-                        boolean bonus = killer.hasPermission(PERMISSION_EXTRA);
-                        double amount = bonus ? MONEY_EXTRA : MONEY_BASIC;
+                        double amount = killer.hasPermission(PERMISSION_EXTRA) ? MONEY_EXTRA : MONEY_BASIC;
                         EconomyResponse r = ECONOMY.depositPlayer(killer, amount);
 
                         if (r.transactionSuccess()) {
