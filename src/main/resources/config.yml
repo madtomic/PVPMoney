@@ -6,7 +6,7 @@ rewards:
     amount: 50
     bonus: 50
 punishments:
-    enabled: false
+    enable: false
     amount: 10
 messages:
     killer: '&7You killed &a{{ VICTIM }}&7 and got &a{{ CURRENCY }}{{ AMOUNT }}&7!'
