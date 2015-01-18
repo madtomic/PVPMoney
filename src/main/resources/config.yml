@@ -6,8 +6,16 @@ rewards:
     amount: 50
     bonus: 50
 punishments:
+    fixed: true
     enable: false
     amount: 10
+debts:
+    owed:
+        victim: '&cYou are now {{ CURRENCY }}{{ AMOUNT }} in debt to {{ PLAYER }}!'
+        killer: '&c{{ PLAYER }} is now {{ CURRENCY }}{{ AMOUNT }} in debt to you!'
+    paid:
+        victim: '&aYour debt of {{ CURRENCY }}{{ AMOUNT}} to {{ PLAYER }} has been paid!'
+        killer: '&c{{ PLAYER }}''s debt of {{ CURRENCY }}{{ AMOUNT }} has been paid!'
 messages:
     killer: '&7You killed &a{{ VICTIM }}&7 and got &a{{ CURRENCY }}{{ AMOUNT }}&7!'
     victim: '&7You were killed by &a{{ KILLER }}&7!'

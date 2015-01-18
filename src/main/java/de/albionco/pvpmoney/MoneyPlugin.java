@@ -2,18 +2,26 @@ package de.albionco.pvpmoney;
 
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.*;
+import de.albionco.pvpmoney.async.DebtCollector;
 import de.albionco.pvpmoney.command.Commands;
 import de.albionco.pvpmoney.event.PlayerListener;
+import de.albionco.pvpmoney.obj.Debt;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.mcstats.Metrics;
 
 import java.io.IOException;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 /**
@@ -23,8 +31,11 @@ import java.util.logging.Level;
  */
 public class MoneyPlugin extends JavaPlugin {
 
-    private static MoneyPlugin instance;
+    private static MoneyPlugin instance = null;
+
+    private ConcurrentHashMap<UUID, Set<Debt<Player>>> debtHashMap;
     private CommandsManager<CommandSender> commands;
+    private BukkitTask collectorTask;
 
     /**
      * Get the plugin via the Bukkit plugin manager
@@ -32,13 +43,16 @@ public class MoneyPlugin extends JavaPlugin {
      * @return {@link MoneyPlugin}
      */
     public static MoneyPlugin getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("Something went wrong whilst loading the plugin");
+        }
         return instance;
     }
 
     @Override
     public void onEnable() {
         instance = this;
-        this.saveDefaultConfig();
+        saveDefaultConfig();
 
         if (setupEconomy()) {
             getLogger().info("Using \"" + Statics.ECONOMY.getName() + "\" for rewards.");
@@ -75,17 +89,13 @@ public class MoneyPlugin extends JavaPlugin {
                 }
             });
 
-            if (Statics.DEBUG) {
-                getLogger().log(Level.INFO, "Configured metrics service, about to start");
-            }
-
             if (metrics.start()) {
-                getLogger().log(Level.INFO, "Metrics service started succesfully");
+                getLogger().info("Metrics service started succesfully");
             } else {
-                getLogger().log(Level.INFO, "Metrics could not be enabled");
+                getLogger().info("Metrics could not be enabled");
             }
         } catch (IOException e) {
-            getLogger().log(Level.WARNING, "Metrics could not be enabled");
+            getLogger().info("Metrics could not be enabled");
         }
 
         this.commands = new CommandsManager<CommandSender>() {
@@ -98,14 +108,7 @@ public class MoneyPlugin extends JavaPlugin {
         CommandsManagerRegistration commands = new CommandsManagerRegistration(this, this.commands);
         commands.register(Commands.ParentCommand.class);
 
-        /*
-         * Fix the player listener not registering correctly,
-         * thanks to @Live4Redline on GitHub for reporting.
-         */
-        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
-        if (Statics.DEBUG) {
-            getLogger().log(Level.INFO, "Registered event listener");
-        }
+        Bukkit.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
     }
 
     /**
@@ -117,9 +120,6 @@ public class MoneyPlugin extends JavaPlugin {
         RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(Economy.class);
         if(economyProvider != null) {
             Statics.ECONOMY = economyProvider.getProvider();
-        }
-        if (Statics.DEBUG) {
-            getLogger().log(Level.INFO, "Setting up vault economy");
         }
         return Statics.ECONOMY != null;
     }
@@ -139,7 +139,7 @@ public class MoneyPlugin extends JavaPlugin {
             if (e.getCause() instanceof NumberFormatException) {
                 sender.sendMessage(ChatColor.RED + "Number expected, string received instead.");
             } else {
-                sender.sendMessage(ChatColor.RED + "An unknown error occurred executing that command, please contact an administrator.");
+                sender.sendMessage(ChatColor.RED + "An unknown error occured executing that command, please contact an administrator.");
                 e.printStackTrace();
             }
         } catch (CommandException e) {
@@ -152,15 +152,60 @@ public class MoneyPlugin extends JavaPlugin {
      * Simple method to load config values.
      */
     public void init() {
-        Statics.DEBUG = getConfig().getBoolean("debug", false);
+        if (debtHashMap != null) {
+            debtHashMap.clear();
+        } else {
+            debtHashMap = new ConcurrentHashMap<>();
+        }
+
         Statics.ENABLE_REWARD = getConfig().getBoolean("rewards.enable", true);
         Statics.ENABLE_PUNISHMENT = getConfig().getBoolean("punishments.enable", false);
         Statics.MONEY_CURRENCY = getConfig().getString("rewards.currency", "$");
         Statics.MESSAGE_DEATH = getConfig().getString("messages.victim", "&7You were killed by &a{{ KILLER }}&7!");
+
         Statics.MESSAGE_KILLER = getConfig().getString("messages.killer", "&7You killed &a{{ VICTIM }}&7 and got &a{{ CURRENCY }}{{ AMOUNT }}&7!");
         Statics.MONEY_BASIC = getConfig().getDouble("rewards.amount", 50.00);
         Statics.MONEY_EXTRA = getConfig().getDouble("rewards.bonus", 100.00);
+
         Statics.MESSAGE_PUNISHED = getConfig().getString("messages.punished", "&7You were killed by &a{{ KILLER }}&7 and lost &a{{ CURRENCY }}{{ AMOUNT }}!");
         Statics.MONEY_PUNISH = getConfig().getDouble("punishments.amount", 10.00);
+
+        Statics.DEBT_SET = getConfig().getString("debts.owed.victim", "&cYou are now {{ CURRENCY }}{{ AMOUNT }} in debt to {{ PLAYER }}!");
+        Statics.DEBT_SET_KILLER = getConfig().getString("debts.owed.killer", "&c{{ PLAYER }} is now {{ CURRENCY }}{{ AMOUNT }} in debt to you!");
+        Statics.DEBT_PAID = getConfig().getString("debts.paid.victim", "&aYour debt of {{ CURRENCY }}{{ AMOUNT}} to {{ PLAYER }} has been paid!");
+        Statics.DEBT_PAID_KILLER = getConfig().getString("debts.paid.victim", "&c{{ PLAYER }}'s debt of {{ CURRENCY }}{{ AMOUNT }} has been paid!");
+
+        Statics.ENABLE_DEBTS = getConfig().getBoolean("punishments.fixed", true);
+        if (Statics.ENABLE_DEBTS && !Statics.ENABLE_PUNISHMENT) {
+            getLogger().log(Level.INFO, "Fixed mode is enabled but punishments are disabled,");
+            getLogger().log(Level.INFO, "automatically enabling punishments for this session");
+            Statics.ENABLE_PUNISHMENT = true;
+        }
+
+        if (Statics.ENABLE_DEBTS && Statics.ENABLE_PUNISHMENT) {
+            if (collectorTask == null || collectorTask.getTaskId() == -1) {
+                // Check for debts every 10 minutes
+                scheduleTask();
+            }
+        }
+    }
+
+    public void scheduleTask() {
+        cancelTask();
+        collectorTask = Bukkit.getScheduler().runTaskTimer(this, new DebtCollector(), 60L, Statics.DEBUG ? 100L : 6000L);
+    }
+
+    public void cancelTask() {
+        if (collectorTask != null && collectorTask.getTaskId() != -1) {
+            collectorTask.cancel();
+            collectorTask = null;
+        }
+    }
+
+    /**
+     * @return a HashMap containing a Set of {@link de.albionco.pvpmoney.obj.Debt} objects that a player owes
+     */
+    public ConcurrentHashMap<UUID, Set<Debt<Player>>> getDebts() {
+        return debtHashMap;
     }
 }

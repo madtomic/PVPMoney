@@ -42,6 +42,22 @@ public class Statics {
      */
     public static String MESSAGE_PUNISHED = "&7You were killed by &a{{ KILLER }} &7and lost &a{{ CURRENCY }}{{ AMOUNT }}&7!";
     /**
+     * Message displayed to the victim when a debt has been paid
+     */
+    public static String DEBT_PAID = "&aYour debt of {{ CURRENCY }}{{ AMOUNT}} to {{ PLAYER }} has been paid!";
+    /**
+     * Message displayted to the killer when a debt has been paid
+     */
+    public static String DEBT_PAID_KILLER = "&c{{ PLAYER }}'s debt of {{ CURRENCY }}{{ AMOUNT }} has been paid!";
+    /**
+     * Message displayed to the victim when they become in debt to their killer
+     */
+    public static String DEBT_SET = "&cYou are now {{ CURRENCY }}{{ AMOUNT }} in debt to {{ PLAYER }}!";
+    /**
+     * Message displayed to the killer when their victim is in debt to them
+     */
+    public static String DEBT_SET_KILLER = "&c{{ PLAYER }} is now {{ CURRENCY }}{{ AMOUNT }} in debt to you!";
+    /**
      * Amount of money awarded to players who can receive rewards
      */
     public static double MONEY_BASIC = 50.0;
@@ -89,6 +105,10 @@ public class Statics {
      * Store whether the plugin should log messages verbosely or not
      */
     public static boolean DEBUG = false;
+    /**
+     * Store whether the plugin should only pay players if the victim has enough money
+     */
+    public static boolean ENABLE_DEBTS = false;
 
     private Statics() {
 

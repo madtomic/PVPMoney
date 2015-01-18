@@ -89,6 +89,18 @@ public class Commands {
             Statics.ENABLE_REWARD = !Statics.ENABLE_REWARD;
         } else if (sub.equalsIgnoreCase("punishments")) {
             Statics.ENABLE_PUNISHMENT = !Statics.ENABLE_PUNISHMENT;
+        } else if (sub.equalsIgnoreCase("debts")) {
+            if (!Statics.ENABLE_DEBTS) {
+                if (!Statics.ENABLE_PUNISHMENT) {
+                    Statics.ENABLE_PUNISHMENT = true;
+                }
+            }
+            Statics.ENABLE_DEBTS = !Statics.ENABLE_DEBTS;
+            if (!Statics.ENABLE_DEBTS) {
+                MoneyPlugin.getInstance().cancelTask();
+            } else {
+                MoneyPlugin.getInstance().scheduleTask();
+            }
         } else {
             throw new CommandUsageException("Invalid switch provided.", "/pvpmoney toggle <rewards|punishments>");
         }
