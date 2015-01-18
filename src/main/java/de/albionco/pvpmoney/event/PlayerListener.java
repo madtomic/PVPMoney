@@ -104,22 +104,28 @@ public class PlayerListener implements Listener {
 
             if (ENABLE_PUNISHMENT) {
                 if (!ECONOMY.has(victim, amount)) {
-                    killer.sendMessage(Dictionary.format(DEBT_SET_KILLER, "AMOUNT", String.valueOf(amount), "PLAYER", victim.getName()));
-                    victim.sendMessage(Dictionary.format(DEBT_SET, "AMOUNT", String.valueOf(amount), "PLAYER", killer.getName()));
-
-                    if (DEBUG) {
-                        MoneyPlugin.getInstance().getLogger().log(Level.INFO, "Creating new debt from \"{0}\" to \"{1}\" for {2}{3}", new Object[]{ victim.getName(), killer.getName(), MONEY_CURRENCY, amount });
-                    }
-                    Debt<Player> debt = new Debt<>(killer, amount);
                     Set<Debt<Player>> debts;
+                    double debtTotal = amount;
                     if ((debts = MoneyPlugin.getInstance().getDebts().remove(victim.getUniqueId())) == null) {
                         debts = new HashSet<>();
                         if (DEBUG) {
                             MoneyPlugin.getInstance().getLogger().log(Level.INFO, "\"{0}\" had no previous debts, creating a new HashSet<Debt<Player>>()", victim.getName());
                         }
+                    } else {
+                        for (Debt<Player> debt : debts) {
+                            if (debt.getEntity().getUniqueId() == killer.getUniqueId()) {
+                                debtTotal += debt.getAmount();
+                            }
+                        }
                     }
+                    Debt<Player> debt = new Debt<>(killer, amount);
                     debts.add(debt);
                     MoneyPlugin.getInstance().getDebts().put(victim.getUniqueId(), debts);
+                    killer.sendMessage(Dictionary.format(DEBT_SET_KILLER, "AMOUNT", String.valueOf(debtTotal), "PLAYER", victim.getName()));
+                    victim.sendMessage(Dictionary.format(DEBT_SET, "AMOUNT", String.valueOf(debtTotal), "PLAYER", killer.getName()));
+                    if (DEBUG) {
+                        MoneyPlugin.getInstance().getLogger().log(Level.INFO, "Creating new debt from \"{0}\" to \"{1}\" for {2}{3}", new Object[]{ victim.getName(), killer.getName(), MONEY_CURRENCY, amount });
+                    }
                     if (DEBUG) {
                         MoneyPlugin.getInstance().getLogger().log(Level.INFO, "Pushing {0}'s debts to HashMap", victim.getName());
                     }

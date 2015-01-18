@@ -158,6 +158,8 @@ public class MoneyPlugin extends JavaPlugin {
             debtHashMap = new ConcurrentHashMap<>();
         }
 
+        Statics.DEBUG = getConfig().getBoolean("debug", false);
+
         Statics.ENABLE_REWARD = getConfig().getBoolean("rewards.enable", true);
         Statics.ENABLE_PUNISHMENT = getConfig().getBoolean("punishments.enable", false);
         Statics.MONEY_CURRENCY = getConfig().getString("rewards.currency", "$");
@@ -173,7 +175,7 @@ public class MoneyPlugin extends JavaPlugin {
         Statics.DEBT_SET = getConfig().getString("debts.owed.victim", "&cYou are now {{ CURRENCY }}{{ AMOUNT }} in debt to {{ PLAYER }}!");
         Statics.DEBT_SET_KILLER = getConfig().getString("debts.owed.killer", "&c{{ PLAYER }} is now {{ CURRENCY }}{{ AMOUNT }} in debt to you!");
         Statics.DEBT_PAID = getConfig().getString("debts.paid.victim", "&aYour debt of {{ CURRENCY }}{{ AMOUNT}} to {{ PLAYER }} has been paid!");
-        Statics.DEBT_PAID_KILLER = getConfig().getString("debts.paid.victim", "&c{{ PLAYER }}'s debt of {{ CURRENCY }}{{ AMOUNT }} has been paid!");
+        Statics.DEBT_PAID_KILLER = getConfig().getString("debts.paid.killer", "&c{{ PLAYER }}'s debt of {{ CURRENCY }}{{ AMOUNT }} has been paid!");
 
         Statics.ENABLE_DEBTS = getConfig().getBoolean("punishments.fixed", true);
         if (Statics.ENABLE_DEBTS && !Statics.ENABLE_PUNISHMENT) {
@@ -192,7 +194,12 @@ public class MoneyPlugin extends JavaPlugin {
 
     public void scheduleTask() {
         cancelTask();
-        collectorTask = Bukkit.getScheduler().runTaskTimer(this, new DebtCollector(), 60L, Statics.DEBUG ? 100L : 6000L);
+        if (Statics.DEBUG) {
+            collectorTask = Bukkit.getScheduler().runTaskTimer(this, new DebtCollector(), 60L, 100L);
+        } else {
+            collectorTask = Bukkit.getScheduler().runTaskTimer(this, new DebtCollector(), 60L, 6000L);
+        }
+        getLogger().log(Level.INFO, "Scheduled debt collection runnable");
     }
 
     public void cancelTask() {

@@ -8,6 +8,7 @@ import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -20,7 +21,7 @@ import java.util.logging.Level;
 public class DebtCollector implements Runnable {
     @Override
     public void run() {
-        if (MoneyPlugin.getInstance().getDebts() != null && !MoneyPlugin.getInstance().getDebts().isEmpty()) {
+        if (!MoneyPlugin.getInstance().getDebts().isEmpty()) {
             if (Statics.DEBUG) {
                 MoneyPlugin.getInstance().getLogger().log(Level.INFO, "Beginning debt collection");
             }
@@ -29,9 +30,11 @@ public class DebtCollector implements Runnable {
                     Player debter = Bukkit.getPlayer(uuid);
                     Set<Debt<Player>> debts = MoneyPlugin.getInstance().getDebts().remove(uuid);
                     if (debts == null) {
-                        throw new IllegalStateException(String.format("Player (\"%s\") debt collection was null", debter.getName()));
+                        continue;
                     }
-                    for (Debt<Player> debt : debts) {
+                    Iterator<Debt<Player>> debtIterator = debts.iterator();
+                    while (debtIterator.hasNext()) {
+                        Debt<Player> debt = debtIterator.next();
                         if (debt.getEntity().getUniqueId() == uuid || !Statics.ECONOMY.has(debter, debt.getAmount())) {
                             continue;
                         }
@@ -40,7 +43,7 @@ public class DebtCollector implements Runnable {
                             if (response.transactionSuccess()) {
                                 response = Statics.ECONOMY.depositPlayer(debt.getEntity(), debt.getAmount());
                                 if (response.transactionSuccess()) {
-                                    debts.remove(debt);
+                                    debtIterator.remove();
                                     debter.sendMessage(Dictionary.format(Statics.DEBT_PAID, "PLAYER", debt.getEntity().getName(), "AMOUNT", String.valueOf(debt.getAmount())));
                                     debt.getEntity().sendMessage(Dictionary.format(Statics.DEBT_PAID_KILLER, "PLAYER", debter.getName(), "AMOUNT", String.valueOf(debt.getAmount())));
                                 }
