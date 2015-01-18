@@ -26,11 +26,7 @@ public class PlayerListener implements Listener {
             if (DEBUG) {
                 getInstance().getLogger().log(Level.INFO, "Player \"{0}\" tested successful for a killer", event.getEntity().getName());
             }
-            /*
-             * Apparently committing suicide by jumping in lava would reward the player.
-             * Thanks @BanKz4G for finding.
-             */
-            if(event.getEntity().getKiller() != event.getEntity()) {
+            if (event.getEntity().getKiller().getUniqueId() != event.getEntity().getUniqueId()) {
                 if (DEBUG) {
                     getInstance().getLogger().log(Level.INFO, "Player {0}\'s death was not suicide", event.getEntity().getName());
                 }
@@ -49,46 +45,14 @@ public class PlayerListener implements Listener {
                 }
 
                 if (ENABLE_REWARD) {
-                    if (killer.hasPermission(PERMISSION_BASIC) || killer.hasPermission(PERMISSION_EXTRA)) {
-                        double amount = killer.hasPermission(PERMISSION_EXTRA) ? MONEY_EXTRA : MONEY_BASIC;
-                        EconomyResponse r = ECONOMY.depositPlayer(killer, amount);
-
-                        if (r.transactionSuccess()) {
-                            if (DEBUG) {
-                                getInstance().getLogger().log(Level.INFO, "Transaction successful, paid \"{0}\" {1}", new Object[]{killer.getName(), amount});
-                            }
-                            METRICS_PAID += amount;
-                            killer.sendMessage(Dictionary.format(MESSAGE_KILLER, "KILLER", killer.getName(), "VICTIM", victim.getName(), "AMOUNT", String.valueOf(amount)));
-                        } else {
-                            killer.sendMessage(Dictionary.colour("&cAn internal error occurred whilst processing your reward."));
-                            getInstance().getLogger().log(Level.WARNING, "Unable to pay {0} player for their kill", killer.getName());
-                        }
-                    } else {
-                        if (DEBUG) {
-                            getInstance().getLogger().log(Level.INFO, "Killer does not have permission to get rewards");
-                        }
+                    if (!reward(killer, victim)) {
+                        return;
                     }
                 }
 
                 if (ENABLE_PUNISHMENT) {
-                    if (!victim.hasPermission(PERMISSION_EXEMPT)) {
-                        EconomyResponse p = ECONOMY.withdrawPlayer(victim, MONEY_PUNISH);
-
-                        if (p.transactionSuccess()) {
-                            if (DEBUG) {
-                                getInstance().getLogger().log(Level.INFO, "Transaction successful, deducted {0} from player \"{1}\"", new Object[]{MONEY_PUNISH, victim.getName()});
-                            }
-                            METRICS_PUNISHED += MONEY_PUNISH;
-                            victim.sendMessage(Dictionary.format(MESSAGE_PUNISHED, "KILLER", killer.getName(), "VICTIM", victim.getName(), "AMOUNT", String.valueOf(MONEY_PUNISH)));
-                            // Stop any code after this point from executing
-                            return;
-                        } else {
-                            getInstance().getLogger().log(Level.WARNING, "Unable to withdraw money from {0}'s account", victim.getName());
-                        }
-                    } else {
-                        if (DEBUG) {
-                            getInstance().getLogger().log(Level.INFO, "Victim is exempt from punishments");
-                        }
+                    if (punish(killer, victim)) {
+                        return;
                     }
                 }
 
@@ -106,5 +70,58 @@ public class PlayerListener implements Listener {
                 getInstance().getLogger().log(Level.INFO, "Killer is null");
             }
         }
+    }
+
+    private boolean punish(Player killer, Player victim) {
+        if (!victim.hasPermission(PERMISSION_EXEMPT)) {
+            EconomyResponse p = ECONOMY.withdrawPlayer(victim, MONEY_PUNISH);
+
+            if (p.transactionSuccess()) {
+                if (DEBUG) {
+                    getInstance().getLogger().log(Level.INFO, "Transaction successful, deducted {0} from player \"{1}\"", new Object[]{ MONEY_PUNISH, victim.getName() });
+                }
+                METRICS_PUNISHED += MONEY_PUNISH;
+                victim.sendMessage(Dictionary.format(MESSAGE_PUNISHED, "KILLER", killer.getName(), "VICTIM", victim.getName(), "AMOUNT", String.valueOf(MONEY_PUNISH)));
+                return true;
+            } else {
+                getInstance().getLogger().log(Level.WARNING, "Unable to withdraw money from {0}'s account", victim.getName());
+            }
+        } else {
+            if (DEBUG) {
+                getInstance().getLogger().log(Level.INFO, "Victim is exempt from punishments");
+            }
+        }
+        return false;
+    }
+
+    private boolean reward(Player killer, Player victim) {
+        if (killer.hasPermission(PERMISSION_BASIC) || killer.hasPermission(PERMISSION_EXTRA)) {
+            double amount = killer.hasPermission(PERMISSION_EXTRA) ? MONEY_EXTRA : MONEY_BASIC;
+
+            if (ENABLE_PUNISHMENT) {
+                if (!ECONOMY.has(victim, amount)) {
+                    killer.sendMessage(Dictionary.format(DEBT_SET_KILLER, "AMOUNT", String.valueOf(amount), "PLAYER", victim.getName()));
+                    victim.sendMessage(Dictionary.format(DEBT_SET, "AMOUNT", String.valueOf(amount), "PLAYER", killer.getName()));
+                    return false;
+                }
+            }
+
+            EconomyResponse r = ECONOMY.depositPlayer(killer, amount);
+            if (r.transactionSuccess()) {
+                if (DEBUG) {
+                    getInstance().getLogger().log(Level.INFO, "Transaction successful, paid \"{0}\" {1}", new Object[]{ killer.getName(), amount });
+                }
+                METRICS_PAID += amount;
+                killer.sendMessage(Dictionary.format(MESSAGE_KILLER, "KILLER", killer.getName(), "VICTIM", victim.getName(), "AMOUNT", String.valueOf(amount)));
+            } else {
+                killer.sendMessage(Dictionary.colour("&cAn internal error occurred whilst processing your reward."));
+                getInstance().getLogger().log(Level.WARNING, "Unable to pay {0} player for their kill", killer.getName());
+            }
+        } else {
+            if (DEBUG) {
+                getInstance().getLogger().log(Level.INFO, "Killer does not have permission to get rewards");
+            }
+        }
+        return true;
     }
 }
